@@ -916,14 +916,14 @@
                 let expense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
                 dayEl.innerHTML = `
-                    <span class="text-sm font-medium">${day}</span>
-                    <div class="mt-1 text-xs text-right space-y-0.5">
+                    <span class="text-xs md:text-sm font-medium">${day}</span>
+                    <div class="mt-1 text-[10px] md:text-xs text-right space-y-0.5">
                         ${income > 0 ? `<div class="text-green-600 truncate">+${formatCurrency(income)}</div>` : ''}
                         ${expense > 0 ? `<div class="text-red-600 truncate">-${formatCurrency(expense)}</div>` : ''}
                     </div>
                 `;
                 
-                let dayClass = 'p-2 h-20 md:h-24 bg-white rounded-xl shadow-sm hover:bg-zinc-100 cursor-pointer flex flex-col justify-between transition-all ease-in-out duration-150';
+                let dayClass = 'p-1 md:p-2 h-16 md:h-24 bg-white rounded-xl shadow-sm hover:bg-zinc-100 cursor-pointer flex flex-col justify-between transition-all ease-in-out duration-150';
                 if (dateString === todayString) {
                     dayClass += ' border-2 border-indigo-500';
                 }
