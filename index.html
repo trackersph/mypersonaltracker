@@ -290,6 +290,16 @@
                             
                             <!-- Date Filter -->
                             <div class="space-y-3 mb-4">
+                                <!-- NEW: Quick Filter Buttons -->
+                                <div class="grid grid-cols-4 gap-2">
+                                    <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="3d">Next 3 Days</button>
+                                    <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="1w">Next Week</button>
+                                    <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="2w">Next 2 Weeks</button>
+                                    <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="1m">Next Month</button>
+                                </div>
+                                <div class="text-center text-xs text-zinc-400 font-medium">OR</div>
+                                <!-- END NEW -->
+
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
                                         <label for="upcoming-from" class="block text-xs font-medium text-zinc-500 mb-1">From</label>
@@ -644,6 +654,8 @@
         const upcomingList = document.getElementById('upcoming-list');
         const upcomingListEmpty = document.getElementById('upcoming-list-empty');
         const upcomingSummaryTotal = document.getElementById('upcoming-summary-total');
+        // NEW
+        const quickFilterButtons = document.querySelectorAll('.quick-filter-btn');
 
         // Transaction Modal
         const transactionModal = document.getElementById('transaction-modal');
@@ -820,6 +832,14 @@
             nextMonth.setDate(today.getDate() + 30);
             upcomingFrom.value = getIsoDate(today);
             upcomingTo.value = getIsoDate(nextMonth);
+
+            // NEW: Add listeners for quick filters
+            quickFilterButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setUpcomingDates(button.dataset.period);
+                });
+            });
 
             // Detach old listeners before attaching new ones
             listeners.forEach(unsubscribe => unsubscribe());
@@ -1114,6 +1134,34 @@
         }
 
         filterUpcomingBtn.addEventListener('click', renderUpcomingPayments);
+
+        // NEW: Function to handle quick filter clicks
+        function setUpcomingDates(period) {
+            const today = new Date();
+            let endDate = new Date(today);
+
+            switch (period) {
+                case '3d':
+                    endDate.setDate(today.getDate() + 3);
+                    break;
+                case '1w':
+                    endDate.setDate(today.getDate() + 7);
+                    break;
+                case '2w':
+                    endDate.setDate(today.getDate() + 14);
+                    break;
+                case '1m':
+                    endDate.setMonth(today.getMonth() + 1);
+                    break;
+            }
+
+            upcomingFrom.value = getIsoDate(today);
+            upcomingTo.value = getIsoDate(endDate);
+            
+            // Automatically update the list
+            renderUpcomingPayments();
+        }
+        
         logSearch.addEventListener('input', renderLogsTable);
         logSort.addEventListener('change', renderLogsTable);
 
@@ -1593,4 +1641,4 @@
     </script>
 
 </body>
-</html>
+</html>s
