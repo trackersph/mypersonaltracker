@@ -1,568 +1,673 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Personal Expense Tracker</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        /* iOS 18-inspired Styling */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f3f4f6; /* iOS-like light grey background */
-            overscroll-behavior: none;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* iOS-like light gray background */
         }
-
-        /* iOS-style segmented control for tabs */
+        
+        /* iOS-style Segmented Control for Tabs */
         .segmented-control {
             display: flex;
-            background-color: #e5e5e7; /* Lighter grey for control background */
+            background-color: #e5e5e7;
             border-radius: 9px;
             padding: 2px;
             width: 100%;
         }
-
-        .segmented-control button {
+        .segmented-control-button {
             flex: 1;
             padding: 8px 12px;
             border: none;
             background-color: transparent;
-            border-radius: 7px;
-            font-size: 13px;
-            font-weight: 600;
             color: #555;
+            font-weight: 500;
+            border-radius: 7px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: none;
-            outline: none;
+            font-size: 0.9rem;
         }
-
-        .segmented-control button.active {
+        .segmented-control-button.active {
             background-color: #ffffff;
             color: #000;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
-            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        /* iOS-style segmented control for forms (Income/Expense) */
+        /* iOS-style Segmented Control for Forms (Income/Expense) */
         .form-segmented-control {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
             background-color: #e5e5e7;
             border-radius: 9px;
             padding: 2px;
+            width: 100%;
         }
-
-        .form-segmented-control input[type="radio"] {
-            display: none;
-        }
-
-        .form-segmented-control label {
-            text-align: center;
-            padding: 8px 12px;
-            border-radius: 7px;
-            font-size: 13px;
-            font-weight: 600;
+        .form-segmented-control-label {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background-color: transparent;
             color: #555;
+            font-weight: 500;
+            border-radius: 7px;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.95rem;
         }
-
-        .form-segmented-control input[type="radio"]:checked + label {
+        .form-segmented-control-input {
+            display: none;
+        }
+        .form-segmented-control-input:checked + .form-segmented-control-label {
             background-color: #ffffff;
             color: #000;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
-            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .form-segmented-control-input[value="expense"]:checked + .form-segmented-control-label {
+            color: #ef4444; /* Red for expense */
+        }
+        .form-segmented-control-input[value="income"]:checked + .form-segmented-control-label {
+            color: #22c55e; /* Green for income */
+        }
+
+        /* iOS-like Cards */
+        .ios-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 16px;
         }
         
-        /* Modal Backdrop */
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-
-        /* iOS-style cards */
-        .card {
-            background-color: #ffffff;
-            border-radius: 1.25rem; /* 20px */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
-            overflow: hidden;
-        }
-
-        /* iOS-style inputs */
-        .form-input {
-            background-color: #f3f4f6; /* Light grey bg */
+        /* iOS-like Form Inputs */
+        .ios-input, .ios-select {
+            background-color: #f3f4f6;
             border: 1px solid #e5e7eb;
-            border-radius: 12px; /* More rounded */
-            padding: 12px 16px;
-            font-size: 1rem;
             color: #111827;
-            transition: all 0.2s ease;
+            border-radius: 8px;
+            padding: 10px 12px;
+            width: 100%;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
         }
-        .form-input:focus {
+        .ios-input:focus, .ios-select:focus {
             outline: none;
-            border-color: #4f46e5; /* Indigo accent */
-            background-color: #ffffff;
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+            border-color: #3b82f6;
+            background-color: white;
         }
-
-        /* iOS-style buttons */
+        
+        /* iOS-like Buttons */
         .btn-primary {
-            background-color: #4f46e5; /* Indigo */
+            background-color: #3b82f6;
             color: white;
             font-weight: 600;
-            border-radius: 12px;
-            padding: 12px 20px;
-            transition: all 0.2s ease;
+            border-radius: 8px;
+            padding: 10px 16px;
+            transition: background-color 0.2s ease;
+            width: 100%;
+            border: none;
+            cursor: pointer;
         }
         .btn-primary:hover {
-            background-color: #4338ca;
+            background-color: #2563eb;
         }
 
         .btn-secondary {
             background-color: #e5e7eb;
-            color: #111827;
+            color: #1f2937;
             font-weight: 600;
-            border-radius: 12px;
-            padding: 12px 20px;
-            transition: all 0.2s ease;
+            border-radius: 8px;
+            padding: 10px 16px;
+            transition: background-color 0.2s ease;
+            width: 100%;
+            border: none;
+            cursor: pointer;
         }
         .btn-secondary:hover {
             background-color: #d1d5db;
         }
 
         .btn-danger {
-            background-color: #dc2626; /* Red */
+            background-color: #ef4444;
             color: white;
             font-weight: 600;
-            border-radius: 12px;
-            padding: 12px 20px;
-            transition: all 0.2s ease;
+            border-radius: 8px;
+            padding: 10px 16px;
+            transition: background-color 0.2s ease;
+            width: 100%;
+            border: none;
+            cursor: pointer;
         }
         .btn-danger:hover {
-            background-color: #b91c1c;
+            background-color: #dc2626;
         }
 
-        .btn-danger-outline {
-            background-color: #fee2e2;
-            color: #dc2626;
-            border: 1px solid #fca5a5;
+        /* Calendar Styling */
+        #calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .calendar-day-header {
+            font-size: 0.7rem;
             font-weight: 600;
-            border-radius: 12px;
-            padding: 12px 20px;
-            transition: all 0.2s ease;
+            color: #6b7280;
+            text-align: center;
+            padding-bottom: 4px;
         }
-        .btn-danger-outline:hover {
-            background-color: #fecaca;
+        /* Mobile-specific adjustments for calendar cells */
+        .calendar-day {
+            background-color: white;
+            border-radius: 8px;
+            height: 60px; /* Reduced height for mobile */
+            padding: 4px; /* Reduced padding for mobile */
+            font-size: 0.8rem; /* Smaller day number */
+            font-weight: 500;
+            color: #111827;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .calendar-day:hover {
+            background-color: #f9fafb;
+        }
+        .calendar-day.other-month {
+            background-color: transparent;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .calendar-day.today {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .calendar-day .day-number {
+            font-weight: 600;
+        }
+        .calendar-day .day-total {
+            font-size: 0.65rem; /* Smaller text for amounts */
+            font-weight: 600;
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            text-align: right;
+            line-height: 1.2;
+        }
+        .day-total .expense-total {
+            color: #ef4444;
+        }
+        .day-total .income-total {
+            color: #22c55e;
         }
 
-
-        /* Custom scrollbar */
+        /* Desktop/Tablet adjustments */
+        @media (min-width: 640px) {
+            .calendar-day {
+                height: 110px;
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+            .calendar-day .day-total {
+                font-size: 0.75rem;
+                bottom: 8px;
+                right: 8px;
+            }
+        }
+        
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-thumb {
             background: #d1d5db;
-            border-radius: 3px;
+            border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #9ca3af;
         }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
     </style>
 </head>
-<body class="antialiased text-zinc-900">
+<body class="h-full">
 
     <!-- Global Loading Spinner -->
-    <div id="loading-spinner" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-[9999] transition-opacity duration-300">
-        <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <div id="loading-spinner" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm opacity-0 hidden transition-opacity duration-300">
+        <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
     </div>
 
-    <!-- Login View -->
-    <div id="login-view" class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-md">
-            <!-- Login Box -->
-            <div id="login-box" class="bg-white p-8 rounded-3xl shadow-xl space-y-6">
-                <h1 class="text-3xl font-bold text-center text-zinc-800">My Personal Expense Tracker</h1>
-                <p class="text-center text-zinc-600">Sign in to track your expenses.</p>
-                <form id="login-form" class="space-y-4">
-                    <input type="email" id="login-email" name="email" class="form-input w-full" placeholder="Email" required>
-                    <input type="password" id="login-password" name="password" class="form-input w-full" placeholder="Password" required>
-                    <p id="login-error" class="text-red-500 text-sm text-center"></p>
-                    <button type="submit" class="btn-primary w-full !mt-6">Sign In</button>
-                </form>
-                <p class="text-center text-sm text-zinc-500">
-                    Don't have an account? <a href="#" id="show-register" class="font-medium text-indigo-600 hover:text-indigo-500">Sign Up</a>
-                </p>
+    <!-- Login/Register Screen -->
+    <div id="auth-screen" class="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-md space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+                    My Personal Expense Tracker
+                </h2>
             </div>
 
-            <!-- Register Box (Hidden by default) -->
-            <div id="register-box" class="bg-white p-8 rounded-3xl shadow-xl space-y-6 hidden">
-                <h1 class="text-3xl font-bold text-center text-zinc-800">Create Account</h1>
-                <p class="text-center text-zinc-600">Get started with your tracker.</p>
-                <form id="register-form" class="space-y-4">
-                    <input type="email" id="register-email" name="email" class="form-input w-full" placeholder="Email" required>
-                    <input type="password" id="register-password" name="password" class="form-input w-full" placeholder="Password" required>
-                    <p id="register-error" class="text-red-500 text-sm text-center"></p>
-                    <button type="submit" class="btn-primary w-full !mt-6">Create Account</button>
-                </form>
-                <p class="text-center text-sm text-zinc-500">
-                    Already have an account? <a href="#" id="show-login" class="font-medium text-indigo-600 hover:text-indigo-500">Sign In</a>
+            <!-- Login Form -->
+            <form id="login-form" class="mt-8 space-y-6">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <input name="email" type="email" autocomplete="email" required class="relative block w-full appearance-none rounded-t-md border border-gray-300 px-3 py-3 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="Email address">
+                    </div>
+                    <div>
+                        <input name="password" type="password" autocomplete="current-password" required class="relative block w-full appearance-none rounded-b-md border border-gray-300 px-3 py-3 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="Password">
+                    </div>
+                </div>
+                <p id="login-error" class="text-sm text-red-600 text-center"></p>
+                <div>
+                    <button type="submit" class="btn-primary w-full">
+                        Sign in
+                    </button>
+                </div>
+                <p class="text-center text-sm">
+                    No account? <a href="#" id="show-register" class="font-medium text-blue-600 hover:text-blue-500">Register here</a>
                 </p>
-            </div>
+            </form>
+
+            <!-- Register Form (Hidden by default) -->
+            <form id="register-form" class="mt-8 space-y-6 hidden">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <input name="email" type="email" autocomplete="email" required class="relative block w-full appearance-none rounded-t-md border border-gray-300 px-3 py-3 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="Email address">
+                    </div>
+                    <div>
+                        <input name="password" type="password" autocomplete="new-password" required class="relative block w-full appearance-none rounded-b-md border border-gray-300 px-3 py-3 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm" placeholder="Password">
+                    </div>
+                </div>
+                <p id="register-error" class="text-sm text-red-600 text-center"></p>
+                <div>
+                    <button type="submit" class="btn-primary w-full">
+                        Register
+                    </button>
+                </div>
+                <p class="text-center text-sm">
+                    Have an account? <a href="#" id="show-login" class="font-medium text-blue-600 hover:text-blue-500">Sign in</a>
+                </p>
+            </form>
         </div>
     </div>
 
-    <!-- Main App View (Hidden by default) -->
-    <div id="main-app-view" class="max-w-7xl mx-auto p-4 md:p-8 space-y-6 hidden">
-        
-        <!-- Header -->
-        <header class="flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-zinc-900">My Personal Expense Tracker</h1>
-            <div class="flex items-center space-x-4">
-                <span id="user-email-display" class="text-sm text-zinc-600 hidden md:block"></span>
-                <button id="logout-button" class="btn-secondary text-sm !py-2 !px-4">Logout</button>
-            </div>
-        </header>
+    <!-- Main App Screen (Hidden by default) -->
+    <div id="app-screen" class="hidden h-full">
+        <div class="flex flex-col h-full max-w-4xl mx-auto">
+            <!-- Header -->
+            <header class="p-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900">My Personal Expense Tracker</h1>
+                <button id="logout-btn" class="text-sm font-medium text-blue-600 hover:text-blue-500">Sign Out</button>
+            </header>
+            
+            <!-- Tab Navigation -->
+            <nav class="p-4 pt-0">
+                <div class="segmented-control">
+                    <button class="segmented-control-button active" data-tab="calendar">Calendar & Logs</button>
+                    <button class="segmented-control-button" data-tab="reports">Reports</button>
+                    <button class="segmented-control-button" data-tab="settings">Settings</button>
+                </div>
+            </nav>
 
-        <!-- Tab Navigation -->
-        <nav class="segmented-control">
-            <button id="tab-calendar" class="tab-button active" data-tab="calendar">Calendar</button>
-            <button id="tab-reports" class="tab-button" data-tab="reports">Reports</button>
-            <button id="tab-settings" class="tab-button" data-tab="settings">Settings</button>
-        </nav>
-
-        <!-- Tab Content -->
-        <main>
-            <!-- Calendar/Log Tab -->
-            <div id="content-calendar" class="tab-content space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Main Calendar -->
-                    <div class="lg:col-span-2 card p-4 md:p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <button id="prev-month" class="p-2 rounded-lg hover:bg-zinc-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-zinc-600"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
-                            </button>
-                            <h2 id="month-year" class="text-xl font-bold text-center"></h2>
-                            <button id="next-month" class="p-2 rounded-lg hover:bg-zinc-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-zinc-600"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
-                            </button>
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 pt-0 space-y-6">
+                
+                <!-- Tab 1: Calendar & Logs -->
+                <div id="tab-calendar" class="tab-content space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Main Calendar -->
+                        <div class="lg:col-span-2">
+                            <div class="ios-card">
+                                <!-- Calendar Header -->
+                                <div class="flex justify-between items-center mb-4">
+                                    <button id="prev-month" class="p-2 rounded-full hover:bg-gray-100">
+                                        <svg class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                                    </button>
+                                    <h2 id="current-month-year" class="text-lg font-bold"></h2>
+                                    <button id="next-month" class="p-2 rounded-full hover:bg-gray-100">
+                                        <svg class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                </div>
+                                <!-- Calendar Grid -->
+                                <div class="grid grid-cols-7 gap-1 mb-2">
+                                    <div class="calendar-day-header">SUN</div>
+                                    <div class="calendar-day-header">MON</div>
+                                    <div class="calendar-day-header">TUE</div>
+                                    <div class="calendar-day-header">WED</div>
+                                    <div class="calendar-day-header">THU</div>
+                                    <div class="calendar-day-header">FRI</div>
+                                    <div class="calendar-day-header">SAT</div>
+                                </div>
+                                <div id="calendar-grid">
+                                    <!-- Days will be injected by JS -->
+                                </div>
+                            </div>
                         </div>
-                        <div id="calendar-grid" class="grid grid-cols-7 gap-1 md:gap-2">
-                            <!-- Day headers -->
-                            <div class="text-center text-xs font-semibold text-zinc-500 uppercase py-2">Sun</div>
-                            <div class="text-center text-xs font-semibold text-zinc-500 uppercase py-2">Mon</div>
-                            <div class="text-center text-xs font-semibold text-zinc-500 uppercase py-2">Tue</div>
-                            <div class="text-center text-xs font-semibold text-zinc-500 uppercase py-2">Wed</div>
-                            <div class="text-center text-xs font-semibold text-zinc-500 uppercase py-2">Thu</div>
-                            <div class="text-center text-xs font-semibold text-zinc-500 uppercase py-2">Fri</div>
-                            <div class="text-center text-xs font-semibold text-zinc-500 uppercase py-2">Sat</div>
-                            <!-- Calendar days will be generated here -->
-                        </div>
-                    </div>
-
-                    <!-- Upcoming & Summary Sidebar -->
-                    <div class="lg:col-span-1 space-y-6">
-                        <div class="card p-4 md:p-6">
-                            <h3 class="text-lg font-semibold mb-4">Upcoming</h3>
-                            
-                            <!-- Summary -->
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-zinc-700 mb-1">Summary</label>
-                                <div class="p-4 bg-zinc-100 rounded-xl">
-                                    <div class="text-xs text-zinc-500">Total Projected Expenses</div>
+                        
+                        <!-- Right Sidebar: Upcoming -->
+                        <div class="lg:col-span-1 space-y-6">
+                            <div class="ios-card">
+                                <h3 class="font-bold text-lg mb-4">Upcoming</h3>
+                                
+                                <!-- Summary -->
+                                <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                                    <div class="text-sm font-medium text-gray-500 mb-1">Projected Expenses</div>
                                     <div id="upcoming-summary-total" class="text-2xl font-bold text-red-600">₱0.00</div>
                                 </div>
-                            </div>
-                            
-                            <!-- Date Filter -->
-                            <div class="space-y-3 mb-4">
-                                <!-- NEW: Quick Filter Buttons -->
-                                <div class="grid grid-cols-4 gap-2">
-                                    <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="3d">Next 3 Days</button>
-                                    <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="1w">Next Week</button>
-                                    <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="2w">Next 2 Weeks</button>
-                                    <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="1m">Next Month</button>
-                                </div>
-                                <div class="text-center text-xs text-zinc-400 font-medium">OR</div>
-                                <!-- END NEW -->
+                                
+                                <!-- Date Filter -->
+                                <div class="space-y-3 mb-4">
+                                    <!-- NEW: Quick Filter Buttons -->
+                                    <div class="grid grid-cols-4 gap-2">
+                                        <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="3d">Next 3 Days</button>
+                                        <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="1w">Next Week</button>
+                                        <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="2w">Next 2 Weeks</button>
+                                        <button class="btn-secondary !text-xs !py-1.5 quick-filter-btn" data-period="1m">Next Month</button>
+                                    </div>
+                                    <div class="text-center text-xs text-zinc-400 font-medium">OR</div>
+                                    <!-- END NEW -->
 
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label for="upcoming-from" class="block text-xs font-medium text-zinc-500 mb-1">From</label>
-                                        <input type="date" id="upcoming-from" class="form-input w-full !text-sm !py-2">
-                                    </div>
-                                    <div>
-                                        <label for="upcoming-to" class="block text-xs font-medium text-zinc-500 mb-1">To</label>
-                                        <input type="date" id="upcoming-to" class="form-input w-full !text-sm !py-2">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label for="upcoming-from" class="block text-xs font-medium text-zinc-500 mb-1">From</label>
+                                            <input type="date" id="upcoming-from" class="ios-input !text-xs !p-2">
+                                        </div>
+                                        <div>
+                                            <label for="upcoming-to" class="block text-xs font-medium text-zinc-500 mb-1">To</label>
+                                            <input type="date" id="upcoming-to" class="ios-input !text-xs !p-2">
+                                        </div>
                                     </div>
                                 </div>
-                                <button id="filter-upcoming-btn" class="btn-secondary w-full !text-sm !py-2">Filter Upcoming</button>
+                                <button id="filter-upcoming-btn" class="btn-secondary !text-sm !py-2 w-full mb-4">Filter Upcoming</button>
+                                
+                                <!-- List -->
+                                <div id="upcoming-list" class="space-y-3 max-h-48 overflow-y-auto">
+                                    <!-- Upcoming items injected by JS -->
+                                </div>
+                                <div id="upcoming-list-empty" class="text-center text-sm text-gray-500 py-4">
+                                    No upcoming payments in this period.
+                                </div>
                             </div>
-                            
-                            <!-- Upcoming List -->
-                            <div id="upcoming-list" class="max-h-60 overflow-y-auto space-y-3 pr-2">
-                                <!-- Upcoming payments will be generated here -->
-                                <p id="upcoming-list-empty" class="text-sm text-zinc-500 text-center py-4">No upcoming payments in selected range.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- All Transactions Log -->
+                    <div class="ios-card">
+                        <h3 class="font-bold text-lg mb-4">All Transactions</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <input type="text" id="log-search" class="ios-input" placeholder="Search particulars...">
+                            <select id="log-sort" class="ios-select">
+                                <option value="date_desc">Date (Newest First)</option>
+                                <option value="date_asc">Date (Oldest First)</option>
+                                <option value="amount_desc">Amount (High-Low)</option>
+                                <option value="amount_asc">Amount (Low-High)</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[600px] text-left">
+                                <thead class="border-b border-gray-200">
+                                    <tr>
+                                        <th class="py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Date</th>
+                                        <th class="py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Particular</th>
+                                        <th class="py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Amount</th>
+                                        <th class="py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Account</th>
+                                        <th class="py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logs-table-body">
+                                    <!-- Rows injected by JS -->
+                                </tbody>
+                            </table>
+                            <div id="logs-table-empty" class="text-center text-sm text-gray-500 py-8">
+                                No transactions found.
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- All Transactions Log -->
-                <div class="card p-4 md:p-6">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                        <h3 class="text-lg font-semibold">All Transactions</h3>
-                        <div class="flex items-center space-x-2 mt-3 md:mt-0">
-                            <input type="text" id="log-search" class="form-input !text-sm !py-2 w-full md:w-auto" placeholder="Search logs...">
-                            <select id="log-sort" class="form-input !text-sm !py-2">
-                                <option value="date-desc">Date (Newest)</option>
-                                <option value="date-asc">Date (Oldest)</option>
-                                <option value="amount-desc">Amount (High)</option>
-                                <option value="amount-asc">Amount (Low)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-[600px] table-fixed">
-                            <thead>
-                                <tr class="border-b border-zinc-200">
-                                    <th class="p-3 text-left text-xs font-semibold text-zinc-500 uppercase w-1/6">Date</th>
-                                    <th class="p-3 text-left text-xs font-semibold text-zinc-500 uppercase w-1/6">Type</th>
-                                    <th class="p-3 text-left text-xs font-semibold text-zinc-500 uppercase w-1/4">Particular</th>
-                                    <th class="p-3 text-left text-xs font-semibold text-zinc-500 uppercase w-1/6">Amount</th>
-                                    <th class="p-3 text-left text-xs font-semibold text-zinc-500 uppercase w-1/6">Account</th>
-                                    <th class="p-3 text-left text-xs font-semibold text-zinc-500 uppercase w-1/6">Frequency</th>
-                                    <th class="p-3 text-left text-xs font-semibold text-zinc-500 uppercase w-1/4">Notes</th>
-                                    <th class="p-3 text-left text-xs font-semibold text-zinc-500 uppercase w-1/6">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="logs-table-body" class="divide-y divide-zinc-100">
-                                <!-- Log rows will be generated here -->
-                            </tbody>
-                        </table>
-                        <p id="logs-table-empty" class="text-sm text-zinc-500 text-center py-8">No transactions found.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reports Tab -->
-            <div id="content-reports" class="tab-content space-y-6 hidden">
-                <!-- Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="card p-6">
-                        <h4 class="text-sm font-medium text-zinc-500 mb-1">Total Expenses (This Month)</h4>
-                        <p id="report-total-expenses" class="text-3xl font-bold text-red-600">₱0.00</p>
-                    </div>
-                    <div class="card p-6">
-                        <h4 class="text-sm font-medium text-zinc-500 mb-1">Total Net Balance</h4>
-                        <p id="report-income-remaining" class="text-3xl font-bold text-green-600">₱0.00</p>
-                        <p class="text-xs text-zinc-400">Sum of all account balances</p>
-                    </div>
-                    <div class="card p-6">
-                        <h4 class="text-sm font-medium text-zinc-500 mb-1">Top Expense (This Month)</h4>
-                        <div id="report-top-expenses" class="space-y-1">
-                            <p class="text-sm text-zinc-500">No expenses yet.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Account Balances Report -->
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold mb-4">Account Balances</h3>
-                    <div id="report-account-balances" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Account balances will be generated here -->
-                        <p id="report-account-empty" class="text-sm text-zinc-500">No accounts set up yet.</p>
-                    </div>
-                </div>
-
-                <!-- Expense Comparison Report -->
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold mb-4">Expense Comparison</h3>
+                <!-- Tab 2: Reports -->
+                <div id="tab-reports" class="tab-content hidden space-y-6">
+                    <!-- Summary Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="compare-particular" class="block text-sm font-medium text-zinc-700 mb-1">Particular</label>
-                            <select id="compare-particular" class="form-input w-full">
-                                <option value="all">All Expenses</option>
-                                <!-- Particulars will be populated here -->
-                            </select>
+                        <div class="ios-card p-4">
+                            <div class="text-sm font-medium text-gray-500 mb-1">Total Net Balance</div>
+                            <div id="report-total-balance" class="text-2xl font-bold text-blue-600">₱0.00</div>
                         </div>
-                        <div>
-                            <label for="compare-period" class="block text-sm font-medium text-zinc-700 mb-1">Compare To</label>
-                            <select id="compare-period" class="form-input w-full">
-                                <option value="last-month">Last Month</option>
-                                <option value="last-week">Last Week</option>
-                                <option value="last-year">Last Year</option>
-                            </select>
+                        <div class="ios-card p-4">
+                            <div class="text-sm font-medium text-gray-500 mb-1">Total Expenses (This Month)</div>
+                            <div id="report-total-expenses" class="text-2xl font-bold text-red-600">₱0.00</div>
                         </div>
-                        <div class="md:self-end">
-                            <button id="run-comparison" class="btn-primary w-full">Run Comparison</button>
+                        <div class="ios-card p-4">
+                            <div class="text-sm font-medium text-gray-500 mb-1">Total Income (This Month)</div>
+                            <div id="report-total-income" class="text-2xl font-bold text-green-600">₱0.00</div>
                         </div>
                     </div>
-                    <div id="comparison-result" class="mt-6 p-6 bg-zinc-100 rounded-xl hidden">
-                        <h4 class="font-semibold">Result</h4>
-                        <p id="comparison-text" class="text-zinc-700"></p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Top Expenses -->
+                        <div class="ios-card">
+                            <h3 class="font-bold text-lg mb-4">Top 3 Expenses (This Month)</h3>
+                            <div id="report-top-expenses" class="space-y-3">
+                                <!-- Injected by JS -->
+                            </div>
+                            <div id="report-top-expenses-empty" class="text-center text-sm text-gray-500 py-4">
+                                No expenses this month.
+                            </div>
+                        </div>
+                        
+                        <!-- Account Balances -->
+                        <div class="ios-card">
+                            <h3 class="font-bold text-lg mb-4">Account Balances</h3>
+                            <div id="report-account-balances" class="space-y-3">
+                                <!-- Injected by JS -->
+                            </div>
+                            <div id="report-account-balances-empty" class="text-center text-sm text-gray-500 py-4">
+                                No accounts set up.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Report Generation -->
+                    <div class="ios-card">
+                        <h3 class="font-bold text-lg mb-4">Generate Report</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                            <input type="date" id="report-from" class="ios-input">
+                            <input type="date" id="report-to" class="ios-input">
+                            <button id="download-csv-btn" class="btn-primary">Download CSV</button>
+                        </div>
+                        <p class="text-xs text-gray-500">Select a date range to download a CSV summary of your transactions.</p>
                     </div>
                 </div>
-
-                <!-- Download Report -->
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold mb-4">Download Report</h3>
-                    <p class="text-sm text-zinc-600 mb-4">Download a CSV of all your transactions.</p>
-                    <button id="download-csv-btn" class="btn-secondary">Download CSV</button>
-                </div>
-            </div>
-
-            <!-- Settings Tab -->
-            <div id="content-settings" class="tab-content space-y-6 hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Tab 3: Settings -->
+                <div id="tab-settings" class="tab-content hidden space-y-6">
+                    
+                    <!-- Manage Accounts -->
+                    <div class="ios-card">
+                        <h3 class="font-bold text-lg mb-4">Manage Accounts</h3>
+                        <form id="add-account-form" class="flex flex-col sm:flex-row gap-4 mb-4">
+                            <input type="text" id="new-account-name" class="ios-input flex-1" placeholder="e.g., GCash, BDO, Cash" required>
+                            <input type="number" id="new-account-balance" class="ios-input sm:w-40" placeholder="Starting Balance" min="0" step="0.01" required>
+                            <button type="submit" class="btn-primary !w-full sm:!w-auto">Add Account</button>
+                        </form>
+                        <div class="space-y-2 max-h-48 overflow-y-auto" id="account-list">
+                            <!-- Injected by JS -->
+                        </div>
+                        <div id="account-list-empty" class="text-center text-sm text-gray-500 py-4">
+                            No accounts added.
+                        </div>
+                    </div>
                     
                     <!-- Manage Particulars -->
-                    <div class="card p-6">
-                        <h3 class="text-lg font-semibold mb-4">Manage Particulars</h3>
-                        <form id="add-particular-form" class="flex space-x-2 mb-4">
-                            <input type="text" id="new-particular-name" class="form-input flex-1" placeholder="e.g., Groceries, Rent" required>
-                            <button type="submit" class="btn-primary !py-3 !px-4">Add</button>
+                    <div class="ios-card">
+                        <h3 class="font-bold text-lg mb-4">Manage Particulars (Categories)</h3>
+                        <form id="add-particular-form" class="flex gap-4 mb-4">
+                            <input type="text" id="new-particular-name" class="ios-input flex-1" placeholder="e.g., Food, Rent, Salary" required>
+                            <button type="submit" class="btn-primary !w-auto">Add Particular</button>
                         </form>
-                        <div id="particulars-list" class="max-h-60 overflow-y-auto space-y-2 pr-2">
-                            <!-- Particulars list will be generated here -->
+                        <div class="space-y-2 max-h-48 overflow-y-auto" id="particular-list">
+                            <!-- Injected by JS -->
+                        </div>
+                        <div id="particular-list-empty" class="text-center text-sm text-gray-500 py-4">
+                            No particulars added.
                         </div>
                     </div>
 
-                    <!-- Manage Accounts -->
-                    <div class="card p-6">
-                        <h3 class="text-lg font-semibold mb-4">Manage Accounts</h3>
-                        <form id="add-account-form" class="space-y-3 mb-4">
-                            <div class="flex space-x-2">
-                                <input type="text" id="new-account-name" class="form-input flex-1" placeholder="e.g., BDO, GCash, Cash" required>
-                                <input type="number" id="new-account-balance" class="form-input w-32" placeholder="Start ₱" step="0.01" required>
-                            </div>
-                            <button type="submit" class="btn-primary w-full">Add Account</button>
-                        </form>
-                        <div id="accounts-list" class="max-h-60 overflow-y-auto space-y-2 pr-2">
-                            <!-- Accounts list will be generated here -->
-                        </div>
-                    </div>
-
-                    <!-- Danger Zone - Hard Reset -->
-                    <div class="card p-6 border-2 border-red-200 bg-red-50 md:col-span-2">
-                        <h3 class="text-lg font-semibold text-red-800 mb-2">Danger Zone</h3>
-                        <p class="text-sm text-red-700 mb-4">This action is permanent and cannot be undone. It will delete all your transactions, accounts, and particulars.</p>
-                        <button id="hard-reset-btn" class="btn-danger-outline">Hard Reset All Data</button>
+                    <!-- Danger Zone -->
+                    <div class="ios-card border-2 border-red-200">
+                        <h3 class="font-bold text-lg text-red-700 mb-2">Danger Zone</h3>
+                        <p class="text-sm text-gray-600 mb-4">This action will permanently delete all your data (transactions, accounts, and particulars). This cannot be undone.</p>
+                        <button id="hard-reset-btn" class="btn-danger !w-auto">Hard Reset Application</button>
                     </div>
                 </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- ********** MODALS ********** -->
+
+    <!-- NEW: Day Summary Modal -->
+    <div id="day-summary-modal" class="fixed inset-0 z-40 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="ios-card w-full max-w-md max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold" id="summary-modal-title">Transactions for...</h2>
+                <button id="close-summary-modal-btn" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
             </div>
-        </main>
+            
+            <div id="day-summary-list" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-2">
+                <!-- Day's transactions injected here -->
+            </div>
+            <div id="day-summary-empty" class="text-center text-gray-500 py-6 hidden">
+                No transactions for this day.
+            </div>
+
+            <button id="add-new-from-summary-btn" class="btn-primary w-full">Add New Transaction</button>
+        </div>
     </div>
 
-    <!-- Transaction Modal -->
-    <div id="transaction-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden animate-fade-in">
-        <div class="card w-full max-w-md p-6 relative animate-slide-up" id="transaction-modal-content">
-            <button id="close-modal" class="absolute top-4 right-4 p-2 rounded-full text-zinc-500 hover:bg-zinc-100">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-            </button>
-            <h2 id="modal-title" class="text-xl font-bold mb-6 text-center">Add Transaction</h2>
-            <form id="transaction-form" class="space-y-4">
+
+    <!-- Add/Edit Transaction Modal -->
+    <div id="transaction-modal" class="fixed inset-0 z-40 flex items-center justify-center p-4 modal-backdrop hidden">
+        <form id="transaction-form" class="ios-card w-full max-w-md max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold" id="modal-title">Add Transaction</h2>
+                <button id="close-modal-btn" type="button" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto space-y-4 pr-2">
                 <input type="hidden" id="transaction-id">
                 <input type="hidden" id="transaction-date">
                 
+                <!-- Transaction Type -->
                 <div class="form-segmented-control">
-                    <input type="radio" id="type-expense" name="type" value="expense" checked>
-                    <label for="type-expense" class="text-red-600">Expense</label>
-                    <input type="radio" id="type-income" name="type" value="income">
-                    <label for="type-income" class="text-green-600">Income</label>
+                    <input type="radio" id="type-expense" name="type" value="expense" class="form-segmented-control-input" checked>
+                    <label for="type-expense" class="form-segmented-control-label">Expense</label>
+                    
+                    <input type="radio" id="type-income" name="type" value="income" class="form-segmented-control-input">
+                    <label for="type-income" class="form-segmented-control-label">Income</label>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="amount" class="block text-sm font-medium text-zinc-700 mb-1">Amount (₱)</label>
-                        <input type="number" id="amount" class="form-input w-full" placeholder="0.00" step="0.01" required>
-                    </div>
-                    <div>
-                        <label for="account" class="block text-sm font-medium text-zinc-700 mb-1">Account</label>
-                        <select id="account" class="form-input w-full" required>
-                            <!-- Account options will be populated here -->
-                        </select>
-                    </div>
-                </div>
-                
+                <!-- Amount -->
                 <div>
-                    <label for="particular" class="block text-sm font-medium text-zinc-700 mb-1">Particular</label>
-                    <select id="particular" class="form-input w-full" required>
-                        <!-- Particular options will be populated here -->
+                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount (₱)</label>
+                    <input type="number" id="amount" class="ios-input" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                
+                <!-- Particulars -->
+                <div>
+                    <label for="particular" class="block text-sm font-medium text-gray-700 mb-1">Particular</label>
+                    <select id="particular" class="ios-select" required>
+                        <option value="">Select a particular...</option>
+                        <!-- Options injected by JS -->
                     </select>
                 </div>
-
+                
+                <!-- Account -->
                 <div>
-                    <label for="frequency" class="block text-sm font-medium text-zinc-700 mb-1">Frequency</label>
-                    <select id="frequency" class="form-input w-full">
+                    <label for="account" class="block text-sm font-medium text-gray-700 mb-1">Account</label>
+                    <select id="account" class="ios-select" required>
+                        <option value="">Select an account...</option>
+                        <!-- Options injected by JS -->
+                    </select>
+                </div>
+                
+                <!-- Recurring -->
+                <div>
+                    <label for="recurring" class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                    <select id="recurring" class="ios-select">
                         <option value="one-time">One-time</option>
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
-                        <option value="bi-weekly">Bi-weekly (Every 2 weeks)</option>
                         <option value="monthly">Monthly</option>
-                        <option value="quarterly">Quarterly (Every 3 months)</option>
                         <option value="yearly">Yearly</option>
                     </select>
                 </div>
-
+                
+                <!-- Notes -->
                 <div>
-                    <label for="notes" class="block text-sm font-medium text-zinc-700 mb-1">Notes (Optional)</label>
-                    <input type="text" id="notes" class="form-input w-full" placeholder="e.g., Birthday gift for Ana">
+                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                    <textarea id="notes" rows="2" class="ios-input" placeholder="e.g., Lunch with team"></textarea>
                 </div>
-
-                <div class="pt-4">
-                    <button type="submit" id="save-transaction-btn" class="btn-primary w-full">Save Transaction</button>
-                </div>
-            </form>
-        </div>
+            </div>
+            
+            <div class="mt-6">
+                <button type="submit" class="btn-primary w-full">Save Transaction</button>
+            </div>
+        </form>
     </div>
 
     <!-- Edit Account Modal -->
-    <div id="edit-account-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
-        <div class="card w-full max-w-md p-6 relative">
-            <button id="close-edit-account-modal" class="absolute top-4 right-4 p-2 rounded-full text-zinc-500 hover:bg-zinc-100">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-            </button>
-            <h2 class="text-xl font-bold mb-6">Edit Account</h2>
-            <form id="edit-account-form" class="space-y-4">
-                <input type="hidden" id="edit-account-id">
+    <div id="edit-account-modal" class="fixed inset-0 z-40 flex items-center justify-center p-4 modal-backdrop hidden">
+        <form id="edit-account-form" class="ios-card w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Edit Account</h2>
+                <button id="close-edit-account-modal-btn" type="button" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            
+            <input type="hidden" id="edit-account-id">
+            
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Account Name</label>
-                    <input type="text" id="edit-account-name" class="form-input w-full" readonly>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+                    <input type="text" id="edit-account-name" class="ios-input bg-gray-200" readonly>
                 </div>
                 <div>
-                    <label for="edit-account-balance" class="block text-sm font-medium text-zinc-700 mb-1">Starting Balance (Reconcile)</label>
-                    <input type="number" id="edit-account-balance" class="form-input w-full" placeholder="0.00" step="0.01" required>
+                    <label for="edit-account-balance" class="block text-sm font-medium text-gray-700 mb-1">Reconcile Starting Balance (₱)</label>
+                    <input type="number" id="edit-account-balance" class="ios-input" placeholder="0.00" step="0.01" min="0" required>
                 </div>
-                <div class="pt-4">
-                    <button type="submit" class="btn-primary w-full">Save Changes</button>
-                </div>
-            </form>
-        </div>
+            </div>
+            
+            <div class="mt-6">
+                <button type="submit" class="btn-primary w-full">Update Balance</button>
+            </div>
+        </form>
     </div>
 
     <!-- Hard Reset Confirmation Modal -->
-    <div id="confirm-reset-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
-        <div class="card w-full max-w-md p-6 relative">
-            <h2 class="text-xl font-bold mb-4 text-red-600">Are you sure?</h2>
-            <p class="text-zinc-600 mb-6">This will permanently delete all your data, including all transactions, accounts, and particulars. This action cannot be undone.</p>
-            <div class="flex justify-end space-x-3">
+    <div id="confirm-reset-modal" class="fixed inset-0 z-40 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="ios-card w-full max-w-md">
+            <h2 class="text-xl font-bold text-red-700 mb-4">Are you sure?</h2>
+            <p class_=("text-sm text-gray-700 mb-6">
+                You are about to delete all your data, including all transactions, accounts, and particulars. 
+                This action is permanent and cannot be undone.
+            </p>
+            <div class="grid grid-cols-2 gap-4">
                 <button id="cancel-reset-btn" class="btn-secondary">Cancel</button>
-                <button id="confirm-reset-btn" class="btn-danger">Yes, Delete Everything</button>
+                <button id="confirm-reset-btn" class="btn-danger">Confirm Delete</button>
             </div>
         </div>
     </div>
@@ -570,7 +675,32 @@
 
     <!-- Firebase SDK -->
     <script type="module">
-        // Firebase Configuration
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            addDoc, 
+            updateDoc, 
+            deleteDoc, 
+            collection, 
+            query, 
+            where, 
+            getDocs,
+            onSnapshot,
+            writeBatch
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyA3Pi_BB5D_uDq9yNYraGyCxg_JukNp66k",
             authDomain: "studio-2523816271-96710.firebaseapp.com",
@@ -580,37 +710,12 @@
             appId: "1:79405504947:web:69b9ac42b50098cec713c6"
         };
 
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged, 
-            signOut 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            doc, 
-            addDoc, 
-            setDoc, 
-            getDoc,
-            getDocs,
-            deleteDoc, 
-            updateDoc,
-            onSnapshot, 
-            query, 
-            where,
-            writeBatch
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- App State ---
+        // Global State
         let currentUserId = null;
         let currentDate = new Date();
         let allTransactions = [];
@@ -618,28 +723,27 @@
         let allAccounts = [];
         let listeners = []; // To store unsubscribe functions
 
-        // --- UI Elements ---
+        // DOM Elements
         const loadingSpinner = document.getElementById('loading-spinner');
-        const loginView = document.getElementById('login-view');
-        const mainAppView = document.getElementById('main-app-view');
+        const authScreen = document.getElementById('auth-screen');
+        const appScreen = document.getElementById('app-screen');
         
-        // Auth UI
+        // Auth Forms
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
         const loginError = document.getElementById('login-error');
         const registerError = document.getElementById('register-error');
         const showRegisterBtn = document.getElementById('show-register');
         const showLoginBtn = document.getElementById('show-login');
-        const logoutButton = document.getElementById('logout-button');
-        const userEmailDisplay = document.getElementById('user-email-display');
+        const logoutBtn = document.getElementById('logout-btn');
 
         // Tabs
-        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabButtons = document.querySelectorAll('.segmented-control-button');
         const tabContents = document.querySelectorAll('.tab-content');
 
         // Calendar Tab
-        const monthYear = document.getElementById('month-year');
         const calendarGrid = document.getElementById('calendar-grid');
+        const currentMonthYear = document.getElementById('current-month-year');
         const prevMonthBtn = document.getElementById('prev-month');
         const nextMonthBtn = document.getElementById('next-month');
         const logsTableBody = document.getElementById('logs-table-body');
@@ -654,52 +758,59 @@
         const upcomingList = document.getElementById('upcoming-list');
         const upcomingListEmpty = document.getElementById('upcoming-list-empty');
         const upcomingSummaryTotal = document.getElementById('upcoming-summary-total');
-        // NEW
         const quickFilterButtons = document.querySelectorAll('.quick-filter-btn');
+
+        // Day Summary Modal (NEW)
+        const daySummaryModal = document.getElementById('day-summary-modal');
+        const summaryModalTitle = document.getElementById('summary-modal-title');
+        const daySummaryList = document.getElementById('day-summary-list');
+        const daySummaryEmpty = document.getElementById('day-summary-empty');
+        const closeSummaryModalBtn = document.getElementById('close-summary-modal-btn');
+        const addNewFromSummaryBtn = document.getElementById('add-new-from-summary-btn');
 
         // Transaction Modal
         const transactionModal = document.getElementById('transaction-modal');
-        const transactionModalContent = document.getElementById('transaction-modal-content');
-        const closeModalBtn = document.getElementById('close-modal');
-        const modalTitle = document.getElementById('modal-title');
         const transactionForm = document.getElementById('transaction-form');
+        const modalTitle = document.getElementById('modal-title');
+        const closeModalBtn = document.getElementById('close-modal-btn');
         const transactionId = document.getElementById('transaction-id');
         const transactionDate = document.getElementById('transaction-date');
+        const typeExpense = document.getElementById('type-expense');
+        const typeIncome = document.getElementById('type-income');
         const amountInput = document.getElementById('amount');
-        const accountInput = document.getElementById('account');
-        const particularInput = document.getElementById('particular');
-        const frequencyInput = document.getElementById('frequency');
+        const particularSelect = document.getElementById('particular');
+        const accountSelect = document.getElementById('account');
+        const recurringSelect = document.getElementById('recurring');
         const notesInput = document.getElementById('notes');
-        const saveTransactionBtn = document.getElementById('save-transaction-btn');
-        const typeExpenseRadio = document.getElementById('type-expense');
-        const typeIncomeRadio = document.getElementById('type-income');
 
         // Reports Tab
+        const reportTotalBalance = document.getElementById('report-total-balance');
         const reportTotalExpenses = document.getElementById('report-total-expenses');
-        const reportIncomeRemaining = document.getElementById('report-income-remaining');
+        const reportTotalIncome = document.getElementById('report-total-income');
         const reportTopExpenses = document.getElementById('report-top-expenses');
+        const reportTopExpensesEmpty = document.getElementById('report-top-expenses-empty');
         const reportAccountBalances = document.getElementById('report-account-balances');
-        const reportAccountEmpty = document.getElementById('report-account-empty');
-        const compareParticular = document.getElementById('compare-particular');
-        const comparePeriod = document.getElementById('compare-period');
-        const runComparisonBtn = document.getElementById('run-comparison');
-        const comparisonResult = document.getElementById('comparison-result');
-        const comparisonText = document.getElementById('comparison-text');
+        const reportAccountBalancesEmpty = document.getElementById('report-account-balances-empty');
+        const reportFrom = document.getElementById('report-from');
+        const reportTo = document.getElementById('report-to');
         const downloadCsvBtn = document.getElementById('download-csv-btn');
 
         // Settings Tab
-        const addParticularForm = document.getElementById('add-particular-form');
-        const newParticularName = document.getElementById('new-particular-name');
-        const particularsList = document.getElementById('particulars-list');
         const addAccountForm = document.getElementById('add-account-form');
         const newAccountName = document.getElementById('new-account-name');
         const newAccountBalance = document.getElementById('new-account-balance');
-        const accountsList = document.getElementById('accounts-list');
+        const accountList = document.getElementById('account-list');
+        const accountListEmpty = document.getElementById('account-list-empty');
+        
+        const addParticularForm = document.getElementById('add-particular-form');
+        const newParticularName = document.getElementById('new-particular-name');
+        const particularList = document.getElementById('particular-list');
+        const particularListEmpty = document.getElementById('particular-list-empty');
 
         // Edit Account Modal
         const editAccountModal = document.getElementById('edit-account-modal');
-        const closeEditAccountModalBtn = document.getElementById('close-edit-account-modal');
         const editAccountForm = document.getElementById('edit-account-form');
+        const closeEditAccountModalBtn = document.getElementById('close-edit-account-modal-btn');
         const editAccountId = document.getElementById('edit-account-id');
         const editAccountName = document.getElementById('edit-account-name');
         const editAccountBalance = document.getElementById('edit-account-balance');
@@ -711,7 +822,8 @@
         const confirmResetBtn = document.getElementById('confirm-reset-btn');
 
 
-        // --- Utility Functions ---
+        // ********** UTILITY FUNCTIONS **********
+
         const showLoading = () => loadingSpinner.classList.remove('opacity-0', 'hidden');
         const hideLoading = () => loadingSpinner.classList.add('opacity-0', 'hidden');
 
@@ -726,239 +838,258 @@
         
         const getIsoDate = (date) => date.toISOString().split('T')[0];
         
-        const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-        
-        const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+        const showModal = (modal) => modal.classList.remove('hidden');
+        const hideModal = (modal) => modal.classList.add('hidden');
 
-        // --- Authentication ---
+        // ********** AUTHENTICATION **********
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // User is signed in
                 currentUserId = user.uid;
-                userEmailDisplay.textContent = user.email;
-                loginView.classList.add('hidden');
-                mainAppView.classList.remove('hidden');
+                authScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
                 initializeAppState();
-                hideLoading();
             } else {
+                // User is signed out
                 currentUserId = null;
-                loginView.classList.remove('hidden');
-                mainAppView.classList.add('hidden');
-                
-                // Detach all listeners
-                listeners.forEach(unsubscribe => unsubscribe());
-                listeners = [];
-                
-                // Clear state
+                authScreen.classList.remove('hidden');
+                appScreen.classList.add('hidden');
+                // Clear state and listeners
                 allTransactions = [];
                 allParticulars = [];
                 allAccounts = [];
-                
-                hideLoading();
+                listeners.forEach(unsubscribe => unsubscribe());
+                listeners = [];
             }
         });
-
-        const handleAuthError = (error, element) => {
-            let message = "An unknown error occurred.";
-            switch (error.code) {
-                case 'auth/invalid-email':
-                    message = "Please enter a valid email.";
-                    break;
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                    message = "Invalid email or password.";
-                    break;
-                case 'auth/email-already-in-use':
-                    message = "This email is already registered.";
-                    break;
-                case 'auth/weak-password':
-                    message = "Password should be at least 6 characters.";
-                    break;
-                default:
-                    console.error(error);
-                    message = error.message;
-            }
-            element.textContent = message;
-        };
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
             loginError.textContent = '';
+            const email = e.target.elements.email.value;
+            const password = e.target.elements.password.value;
             try {
-                await signInWithEmailAndPassword(auth, loginForm.email.value, loginForm.password.value);
+                await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                handleAuthError(error, loginError);
-                hideLoading();
+                console.error("Login Error:", error);
+                loginError.textContent = error.message.replace('Firebase: ', '');
             }
+            hideLoading();
         });
 
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
             registerError.textContent = '';
+            const email = e.target.elements.email.value;
+            const password = e.target.elements.password.value;
             try {
-                await createUserWithEmailAndPassword(auth, registerForm.email.value, registerForm.password.value);
+                await createUserWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                handleAuthError(error, registerError);
-                hideLoading();
+                console.error("Register Error:", error);
+                registerError.textContent = error.message.replace('Firebase: ', '');
             }
+            hideLoading();
         });
 
-        logoutButton.addEventListener('click', async () => {
-            showLoading();
+        logoutBtn.addEventListener('click', async () => {
             await signOut(auth);
         });
 
         showRegisterBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            loginBox.classList.add('hidden');
-            registerBox.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
         });
 
         showLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            registerBox.classList.add('hidden');
-            loginBox.classList.remove('hidden');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
         });
 
-        // --- App Initialization ---
+        // ********** APP INITIALIZATION **********
+
         function initializeAppState() {
             if (!currentUserId) return;
-            showLoading();
             
-            // Set default upcoming dates
+            // Set default dates
             const today = new Date();
-            const nextMonth = new Date(today);
-            nextMonth.setDate(today.getDate() + 30);
-            upcomingFrom.value = getIsoDate(today);
-            upcomingTo.value = getIsoDate(nextMonth);
-
-            // NEW: Add listeners for quick filters
-            quickFilterButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    setUpcomingDates(button.dataset.period);
-                });
-            });
+            const startOfMonth = getIsoDate(new Date(today.getFullYear(), today.getMonth(), 1));
+            const endOfMonth = getIsoDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+            reportFrom.value = startOfMonth;
+            reportTo.value = endOfMonth;
+            
+            // Set default upcoming dates to "Next Week"
+            setUpcomingDates('1w');
 
             // Detach old listeners before attaching new ones
             listeners.forEach(unsubscribe => unsubscribe());
             listeners = [];
 
-            // Listen for transactions
-            const transQuery = collection(db, "users", currentUserId, "transactions");
-            const transListener = onSnapshot(transQuery, (snapshot) => {
-                allTransactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateAllData();
-            }, (error) => console.error("Error listening to transactions: ", error));
-            listeners.push(transListener);
+            // Attach Firestore Listeners
+            try {
+                const transQuery = collection(db, 'users', currentUserId, 'transactions');
+                const transUnsub = onSnapshot(transQuery, (snapshot) => {
+                    allTransactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    updateAllData();
+                }, (error) => console.error("Error listening to transactions:", error));
+                listeners.push(transUnsub);
 
-            // Listen for particulars
-            const partQuery = collection(db, "users", currentUserId, "particulars");
-            const partListener = onSnapshot(partQuery, (snapshot) => {
-                allParticulars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                allParticulars.sort((a, b) => a.name.localeCompare(b.name));
-                renderParticularsList();
-                populateDropdowns();
-            }, (error) => console.error("Error listening to particulars: ", error));
-            listeners.push(partListener);
+                const partQuery = collection(db, 'users', currentUserId, 'particulars');
+                const partUnsub = onSnapshot(partQuery, (snapshot) => {
+                    allParticulars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderParticularsList();
+                    populateDropdowns();
+                }, (error) => console.error("Error listening to particulars:", error));
+                listeners.push(partUnsub);
 
-            // Listen for accounts
-            const accQuery = collection(db, "users", currentUserId, "accounts");
-            const accListener = onSnapshot(accQuery, (snapshot) => {
-                allAccounts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                allAccounts.sort((a, b) => a.name.localeCompare(b.name));
-                renderAccountsList();
-                populateDropdowns();
-                updateAllData(); // Update reports when accounts change
-            }, (error) => console.error("Error listening to accounts: ", error));
-            listeners.push(accListener);
+                const accQuery = collection(db, 'users', currentUserId, 'accounts');
+                const accUnsub = onSnapshot(accQuery, (snapshot) => {
+                    allAccounts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderAccountsList();
+                    populateDropdowns();
+                    updateAllData(); // Update reports when accounts change (starting balance)
+                }, (error) => console.error("Error listening to accounts:", error));
+                listeners.push(accUnsub);
 
-            hideLoading();
+            } catch (error) {
+                console.error("Error setting up Firestore listeners:", error);
+            }
         }
-        
+
+        // ********** DATA RENDERING **********
+
         function updateAllData() {
-            if (!currentUserId) return;
+            // This function is called whenever transactions or accounts change
             renderCalendar();
             renderLogsTable();
             renderUpcomingPayments();
             renderReports();
         }
 
-        // --- Tab Navigation ---
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const targetTab = button.dataset.tab;
-
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-
-                tabContents.forEach(content => {
-                    if (content.id === `content-${targetTab}`) {
-                        content.classList.remove('hidden');
-                    } else {
-                        content.classList.add('hidden');
-                    }
-                });
+        function populateDropdowns() {
+            // Populate Particulars
+            particularSelect.innerHTML = '<option value="">Select a particular...</option>';
+            allParticulars.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.name;
+                option.textContent = p.name;
+                particularSelect.appendChild(option);
             });
-        });
 
-        // --- Calendar Tab ---
+            // Populate Accounts
+            accountSelect.innerHTML = '<option value="">Select an account...</option>';
+            allAccounts.sort((a, b) => a.name.localeCompare(b.name)).forEach(a => {
+                const option = document.createElement('option');
+                option.value = a.name;
+                option.textContent = a.name;
+                accountSelect.appendChild(option);
+            });
+        }
+
+        // ********** CALENDAR TAB **********
+
         function renderCalendar() {
-            calendarGrid.innerHTML = ''; // Clear old calendar
-            // Add day headers
-            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-                const dayEl = document.createElement('div');
-                dayEl.className = 'text-center text-xs font-semibold text-zinc-500 uppercase py-2';
-                dayEl.textContent = day;
-                calendarGrid.appendChild(dayEl);
-            });
-
+            calendarGrid.innerHTML = '';
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            monthYear.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+            currentMonthYear.textContent = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
-            const firstDay = getFirstDayOfMonth(year, month);
-            const daysInMonth = getDaysInMonth(year, month);
-            const todayString = getIsoDate(new Date());
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Calculate transactions for the month
+            const monthTransactions = getProjectedTransactions(
+                new Date(year, month, 1),
+                new Date(year, month, daysInMonth)
+            );
             
-            // Get all projected transactions for the visible month
-            const monthStart = new Date(year, month, 1);
-            const monthEnd = new Date(year, month, daysInMonth);
-            const projectedTransactions = getProjectedTransactions(monthStart, monthEnd, true); // Include future projections for calendar view
+            const dailyTotals = {}; // { 'YYYY-MM-DD': { income: 0, expense: 0 } }
 
-            // Create blank spaces for days before the 1st
+            monthTransactions.forEach(t => {
+                const date = t.date;
+                if (!dailyTotals[date]) {
+                    dailyTotals[date] = { income: 0, expense: 0 };
+                }
+                if (t.type === 'income') {
+                    dailyTotals[date].income += Number(t.amount);
+                } else {
+                    dailyTotals[date].expense += Number(t.amount);
+                }
+            });
+
+            // Fill blank days at the start
             for (let i = 0; i < firstDay; i++) {
-                calendarGrid.appendChild(document.createElement('div'));
+                calendarGrid.innerHTML += `<div class="calendar-day other-month"></div>`;
             }
 
-            // Create day cells
+            // Fill actual days
             for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = getIsoDate(new Date(year, month, day));
+                const today = new Date();
+                const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                
+                const totals = dailyTotals[dateStr] || { income: 0, expense: 0 };
+                
                 const dayEl = document.createElement('div');
-                const date = new Date(year, month, day);
-                const dateString = getIsoDate(date);
+                dayEl.className = 'calendar-day';
+                if (isToday) dayEl.classList.add('today');
+                dayEl.dataset.date = dateStr;
                 
-                let dayTransactions = projectedTransactions.filter(t => t.date === dateString);
-                let income = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                let expense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-
-                dayEl.innerHTML = `
-                    <span class="text-xs md:text-sm font-medium">${day}</span>
-                    <div class="mt-1 text-[10px] md:text-xs text-right space-y-0.5">
-                        ${income > 0 ? `<div class="text-green-600 truncate">+${formatCurrency(income)}</div>` : ''}
-                        ${expense > 0 ? `<div class="text-red-600 truncate">-${formatCurrency(expense)}</div>` : ''}
-                    </div>
-                `;
-                
-                let dayClass = 'p-1 md:p-2 h-16 md:h-24 bg-white rounded-xl shadow-sm hover:bg-zinc-100 cursor-pointer flex flex-col justify-between transition-all ease-in-out duration-150';
-                if (dateString === todayString) {
-                    dayClass += ' border-2 border-indigo-500';
+                let totalHtml = '';
+                if (totals.expense > 0) {
+                    totalHtml += `<div class="expense-total">-${formatCurrency(totals.expense)}</div>`;
+                }
+                if (totals.income > 0) {
+                    totalHtml += `<div class="income-total">+${formatCurrency(totals.income)}</div>`;
                 }
                 
-                dayEl.className = dayClass;
-                dayEl.dataset.date = dateString;
-                dayEl.addEventListener('click', () => openTransactionModal(dateString));
+                dayEl.innerHTML = `
+                    <div class="day-number">${day}</div>
+                    <div class="day-total">${totalHtml}</div>
+                `;
+                
+                dayEl.addEventListener('click', () => onDayClick(dateStr));
                 calendarGrid.appendChild(dayEl);
+            }
+        }
+
+        function onDayClick(dateStr) {
+            transactionDate.value = dateStr; // Set date for new transaction
+            
+            const transactionsForDay = getProjectedTransactions(new Date(dateStr), new Date(dateStr));
+            
+            if (transactionsForDay.length > 0) {
+                // Show Summary Modal
+                summaryModalTitle.textContent = `Transactions for ${new Date(dateStr + 'T00:00:00').toLocaleDateString()}`;
+                daySummaryList.innerHTML = '';
+                daySummaryEmpty.classList.add('hidden');
+                
+                transactionsForDay.forEach(t => {
+                    const isExpense = t.type === 'expense';
+                    const particular = allParticulars.find(p => p.name === t.particular);
+                    
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                    item.innerHTML = `
+                        <div>
+                            <div class="font-medium">${t.particular}</div>
+                            <div class="text-xs text-gray-500">${t.account} ${t.recurring !== 'one-time' ? `(${t.recurring})` : ''}</div>
+                        </div>
+                        <div class="font-medium ${isExpense ? 'text-red-600' : 'text-green-600'}">
+                            ${isExpense ? '-' : '+'}${formatCurrency(t.amount)}
+                        </div>
+                    `;
+                    daySummaryList.appendChild(item);
+                });
+                
+                showModal(daySummaryModal);
+            } else {
+                // No transactions, open "Add" modal directly
+                openTransactionModal(dateStr);
             }
         }
 
@@ -976,26 +1107,21 @@
             logsTableBody.innerHTML = '';
             
             const searchTerm = logSearch.value.toLowerCase();
-            const sortValue = logSort.value;
+            const [sortBy, sortDir] = logSort.value.split('_');
 
-            let filtered = allTransactions.filter(t => {
-                const particular = allParticulars.find(p => p.id === t.particularId)?.name || 'N/A';
-                const account = allAccounts.find(a => a.id === t.accountId)?.name || 'N/A';
-                return t.notes.toLowerCase().includes(searchTerm) ||
-                       particular.toLowerCase().includes(searchTerm) ||
-                       account.toLowerCase().includes(searchTerm) ||
-                       t.amount.toString().includes(searchTerm);
-            });
+            const filtered = allTransactions
+                .filter(t => !searchTerm || t.particular.toLowerCase().includes(searchTerm));
 
             filtered.sort((a, b) => {
-                switch (sortValue) {
-                    case 'date-asc': return new Date(a.date) - new Date(b.date);
-                    case 'amount-desc': return b.amount - a.amount;
-                    case 'amount-asc': return a.amount - b.amount;
-                    case 'date-desc':
-                    default:
-                        return new Date(b.date) - new Date(a.date);
+                let valA, valB;
+                if (sortBy === 'date') {
+                    valA = new Date(a.date);
+                    valB = new Date(b.date);
+                } else { // amount
+                    valA = Number(a.amount);
+                    valB = Number(b.amount);
                 }
+                return sortDir === 'asc' ? valA - valB : valB - valA;
             });
 
             if (filtered.length === 0) {
@@ -1004,136 +1130,548 @@
             } else {
                 logsTableEmpty.classList.add('hidden');
                 logsTableBody.classList.remove('hidden');
+                
+                filtered.forEach(t => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-100';
+                    const isExpense = t.type === 'expense';
+                    
+                    row.innerHTML = `
+                        <td class="py-3 px-3 text-sm">${t.date}</td>
+                        <td class="py-3 px-3 text-sm font-medium">${t.particular}</td>
+                        <td class="py-3 px-3 text-sm font-medium ${isExpense ? 'text-red-600' : 'text-green-600'}">
+                            ${isExpense ? '-' : '+'}${formatCurrency(t.amount)}
+                        </td>
+                        <td class="py-3 px-3 text-sm text-gray-600">${t.account}</td>
+                        <td class="py-3 px-3 text-sm">
+                            <div class="flex items-center gap-2">
+                                <button class="edit-btn p-1 text-blue-600 hover:text-blue-800" data-id="${t.id}">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                </button>
+                                <button class="delete-btn p-1 text-red-600 hover:text-red-800" data-id="${t.id}">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    row.querySelector('.edit-btn').addEventListener('click', () => openTransactionModal(t.date, t.id));
+                    row.querySelector('.delete-btn').addEventListener('click', () => deleteTransaction(t.id));
+                    
+                    logsTableBody.appendChild(row);
+                });
             }
-
-            filtered.forEach(t => {
-                const row = document.createElement('tr');
-                const particular = allParticulars.find(p => p.id === t.particularId)?.name || 'N/A';
-                const account = allAccounts.find(a => a.id === t.accountId)?.name || 'N/A';
-
-                row.innerHTML = `
-                    <td class="p-3 text-sm text-zinc-700">${t.date}</td>
-                    <td class="p-3 text-sm font-medium ${t.type === 'income' ? 'text-green-600' : 'text-red-600'} capitalize">${t.type}</td>
-                    <td class="p-3 text-sm text-zinc-700">${particular}</td>
-                    <td class="p-3 text-sm text-zinc-700">${formatCurrency(t.amount)}</td>
-                    <td class="p-3 text-sm text-zinc-700">${account}</td>
-                    <td class="p-3 text-sm text-zinc-500 capitalize">${t.frequency}</td>
-                    <td class="p-3 text-sm text-zinc-500">${t.notes || ''}</td>
-                    <td class="p-3 text-sm text-zinc-500">
-                        <div class="flex flex-col sm:flex-row gap-1">
-                            <button onclick="handleEditTransaction('${t.id}')" class="p-1 text-indigo-600 hover:text-indigo-800" title="Edit">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
-                            </button>
-                            <button onclick="handleDeleteTransaction('${t.id}')" class="p-1 text-red-600 hover:text-red-800" title="Delete">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12.54 0c.04.03.079.062.118.095m-9.58 0a48.11 48.11 0 0 1 3.478-.397m11.54 0v-1.12c0-.517-.42-1.03-1.033-1.03H8.704c-.613 0-1.033.513-1.033 1.03v1.12m11.54 0H4.772" /></svg>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                logsTableBody.appendChild(row);
-            });
         }
         
-        // --- Projected Transactions Logic ---
-        /**
-         * Gets all transactions (one-time and recurring) within a date range.
-         * @param {Date} startDate - The start of the date range.
-         * @param {Date} endDate - The end of the date range.
-         * @param {boolean} allowFuture - If true, calculates future recurring payments. If false, only includes projections up to today.
-         */
-        function getProjectedTransactions(startDate, endDate, allowFuture = false) {
+        function getProjectedTransactions(startDate, endDate) {
             const projected = [];
-            const startStr = getIsoDate(startDate);
-            const endStr = getIsoDate(endDate);
-            const today = new Date();
-            const todayStr = getIsoDate(today);
-
+            const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+            const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+        
             allTransactions.forEach(t => {
-                const tAmount = Number(t.amount);
-                if (isNaN(tAmount)) return; // Skip invalid transactions
+                const tDate = new Date(t.date + 'T00:00:00'); // Ensure local time
                 
-                const tDate = new Date(t.date + 'T00:00:00'); // Ensure local timezone
-                
-                if (t.frequency === 'one-time') {
-                    if (t.date >= startStr && t.date <= endStr) {
-                        projected.push({ ...t, amount: tAmount });
+                if (t.recurring === 'one-time') {
+                    if (tDate >= start && tDate <= end) {
+                        projected.push(t);
                     }
                 } else {
-                    let currentDate = tDate;
+                    let currentDate = new Date(tDate);
                     
-                    // Set the loop end date: either the requested endDate or today, depending on allowFuture
-                    const loopEndDate = allowFuture ? endDate : (endDate < today ? endDate : today);
-
-                    while (currentDate <= loopEndDate) {
-                        if (currentDate >= startDate) {
+                    // Iterate until the current date is past the end date
+                    while (currentDate <= end) {
+                        if (currentDate >= start) {
                             projected.push({
                                 ...t,
-                                amount: tAmount,
-                                date: getIsoDate(currentDate),
-                                isProjected: getIsoDate(currentDate) !== t.date
+                                date: getIsoDate(currentDate), // Override date with the projected date
+                                originalDate: t.date // Keep track of original
                             });
                         }
                         
-                        switch (t.frequency) {
-                            case 'daily': currentDate.setDate(currentDate.getDate() + 1); break;
-                            case 'weekly': currentDate.setDate(currentDate.getDate() + 7); break;
-                            case 'bi-weekly': currentDate.setDate(currentDate.getDate() + 14); break;
-                            case 'monthly': currentDate.setMonth(currentDate.getMonth() + 1); break;
-                            case 'quarterly': currentDate.setMonth(currentDate.getMonth() + 3); break;
-                            case 'yearly': currentDate.setFullYear(currentDate.getFullYear() + 1); break;
-                            default: currentDate = new Date(loopEndDate.getTime() + 1); // Break loop
+                        // Increment current date based on frequency
+                        switch (t.recurring) {
+                            case 'daily':
+                                currentDate.setDate(currentDate.getDate() + 1);
+                                break;
+                            case 'weekly':
+                                currentDate.setDate(currentDate.getDate() + 7);
+                                break;
+                            case 'monthly':
+                                currentDate.setMonth(currentDate.getMonth() + 1);
+                                break;
+                            case 'yearly':
+                                currentDate.setFullYear(currentDate.getFullYear() + 1);
+                                break;
+                            default:
+                                // Failsafe to prevent infinite loop
+                                currentDate = new Date(end.getTime() + 1); 
+                                break;
                         }
                     }
                 }
             });
+            
             return projected;
         }
 
-        // --- Upcoming Payments ---
         function renderUpcomingPayments() {
             upcomingList.innerHTML = '';
             
-            const fromDate = new Date(upcomingFrom.value + 'T00:00:00');
-            const toDate = new Date(upcomingTo.value + 'T00:00:00');
-            
-            if (isNaN(fromDate) || isNaN(toDate)) {
-                upcomingListEmpty.classList.remove('hidden');
-                upcomingSummaryTotal.textContent = formatCurrency(0);
-                return;
-            }
+            const from = new Date(upcomingFrom.value + 'T00:00:00');
+            const to = new Date(upcomingTo.value + 'T00:00:00');
 
-            // Get future projections for the selected range
-            const upcomingExpenses = getProjectedTransactions(fromDate, toDate, true)
-                .filter(t => t.type === 'expense')
-                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (isNaN(from) || isNaN(to)) return;
 
-            let total = 0;
+            // Get transactions starting from 'from' date
+            const projected = getProjectedTransactions(from, to)
+                .filter(t => t.type === 'expense'); // Only show expenses
+                
+            projected.sort((a, b) => new Date(a.date) - new Date(b.date));
             
-            if (upcomingExpenses.length === 0) {
+            let summaryTotal = 0;
+            
+            if (projected.length === 0) {
                 upcomingListEmpty.classList.remove('hidden');
             } else {
                 upcomingListEmpty.classList.add('hidden');
-                upcomingExpenses.forEach(t => {
-                    const particular = allParticulars.find(p => p.id === t.particularId)?.name || 'N/A';
-                    total += t.amount;
-                    
+                projected.forEach(t => {
+                    summaryTotal += Number(t.amount);
                     const item = document.createElement('div');
-                    item.className = 'flex justify-between items-center p-3 bg-zinc-50 rounded-lg';
+                    item.className = 'flex justify-between items-center text-sm';
                     item.innerHTML = `
                         <div>
-                            <p class="text-sm font-medium text-zinc-800">${particular}</p>
-                            <p class="text-xs text-zinc-500">${t.date} (${t.frequency})</p>
+                            <div class="font-medium">${t.particular}</div>
+                            <div class="text-xs text-gray-500">${t.date}</div>
                         </div>
-                        <span class="text-sm font-semibold text-red-600">${formatCurrency(t.amount)}</span>
+                        <div class="font-medium text-red-600">${formatCurrency(t.amount)}</div>
                     `;
                     upcomingList.appendChild(item);
                 });
             }
             
-            upcomingSummaryTotal.textContent = formatCurrency(total);
+            upcomingSummaryTotal.textContent = formatCurrency(summaryTotal);
         }
 
+        // ********** DAY SUMMARY MODAL (NEW) **********
+        
+        closeSummaryModalBtn.addEventListener('click', () => hideModal(daySummaryModal));
+        
+        addNewFromSummaryBtn.addEventListener('click', () => {
+            hideModal(daySummaryModal);
+            // The transactionDate is already set from onDayClick
+            openTransactionModal(transactionDate.value);
+        });
+
+        // ********** TRANSACTION MODAL **********
+
+        function openTransactionModal(date, id = null) {
+            transactionForm.reset();
+            transactionDate.value = date;
+            
+            if (id) {
+                // Edit Mode
+                modalTitle.textContent = 'Edit Transaction';
+                const t = allTransactions.find(t => t.id === id);
+                if (t) {
+                    transactionId.value = t.id;
+                    amountInput.value = t.amount;
+                    particularSelect.value = t.particular;
+                    accountSelect.value = t.account;
+                    recurringSelect.value = t.recurring;
+                    notesInput.value = t.notes;
+                    if (t.type === 'income') {
+                        typeIncome.checked = true;
+                    } else {
+                        typeExpense.checked = true;
+                    }
+                }
+            } else {
+                // Add Mode
+                modalTitle.textContent = 'Add Transaction';
+                transactionId.value = '';
+                typeExpense.checked = true; // Default to expense
+            }
+            showModal(transactionModal);
+        }
+
+        closeModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(transactionModal);
+        });
+
+        transactionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            
+            const id = transactionId.value;
+            const data = {
+                date: transactionDate.value,
+                type: typeExpense.checked ? 'expense' : 'income',
+                amount: parseFloat(amountInput.value),
+                particular: particularSelect.value,
+                account: accountSelect.value,
+                recurring: recurringSelect.value,
+                notes: notesInput.value,
+                userId: currentUserId
+            };
+
+            if (!data.date || !data.amount || !data.particular || !data.account) {
+                alert("Please fill in all required fields.");
+                hideLoading();
+                return;
+            }
+
+            try {
+                if (id) {
+                    // Update
+                    const docRef = doc(db, 'users', currentUserId, 'transactions', id);
+                    await updateDoc(docRef, data);
+                } else {
+                    // Add
+                    await addDoc(collection(db, 'users', currentUserId, 'transactions'), data);
+                }
+                hideModal(transactionModal);
+            } catch (error) {
+                console.error("Error saving transaction: ", error);
+            }
+            hideLoading();
+        });
+
+        async function deleteTransaction(id) {
+            try {
+                await deleteDoc(doc(db, 'users', currentUserId, 'transactions', id));
+            } catch (error) {
+                console.error("Error deleting transaction: ", error);
+            }
+        }
+
+        // ********** REPORTS TAB **********
+
+        function renderReports() {
+            const today = new Date();
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+            // Get transactions from past up to today
+            const firstTransactionDate = allTransactions.length > 0 
+                ? new Date(allTransactions.reduce((min, t) => new Date(t.date) < new Date(min.date) ? t : min).date + 'T00:00:00')
+                : new Date();
+            const upToToday = getProjectedTransactions(firstTransactionDate, today);
+
+            // Get transactions for this month only
+            const thisMonth = getProjectedTransactions(startOfMonth, endOfMonth);
+            
+            // 1. Total Net Balance (Corrected)
+            let totalNetBalance = 0;
+            const accountBalances = {};
+
+            // Start with all starting balances
+            allAccounts.forEach(acc => {
+                const startBalance = Number(acc.startingBalance) || 0;
+                totalNetBalance += startBalance;
+                accountBalances[acc.name] = startBalance;
+            });
+
+            // Apply all transactions *up to today*
+            upToToday.forEach(t => {
+                const amount = Number(t.amount);
+                if (accountBalances.hasOwnProperty(t.account)) {
+                    if (t.type === 'income') {
+                        totalNetBalance += amount;
+                        accountBalances[t.account] += amount;
+                    } else {
+                        totalNetBalance -= amount;
+                        accountBalances[t.account] -= amount;
+                    }
+                }
+            });
+            reportTotalBalance.textContent = formatCurrency(totalNetBalance);
+
+            // 2. Total Expenses (This Month)
+            const totalExpensesMonth = thisMonth
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + Number(t.amount), 0);
+            reportTotalExpenses.textContent = formatCurrency(totalExpensesMonth);
+
+            // 3. Total Income (This Month)
+            const totalIncomeMonth = thisMonth
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + Number(t.amount), 0);
+            reportTotalIncome.textContent = formatCurrency(totalIncomeMonth);
+
+            // 4. Top 3 Expenses (This Month)
+            const expenseMap = {};
+            thisMonth.filter(t => t.type === 'expense').forEach(t => {
+                expenseMap[t.particular] = (expenseMap[t.particular] || 0) + Number(t.amount);
+            });
+            const topExpenses = Object.entries(expenseMap)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 3);
+            
+            reportTopExpenses.innerHTML = '';
+            if (topExpenses.length === 0) {
+                reportTopExpensesEmpty.classList.remove('hidden');
+            } else {
+                reportTopExpensesEmpty.classList.add('hidden');
+                topExpenses.forEach(([name, amount]) => {
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+                    item.innerHTML = `
+                        <span class="font-medium">${name}</span>
+                        <span class="font-medium text-red-600">${formatCurrency(amount)}</span>
+                    `;
+                    reportTopExpenses.appendChild(item);
+                });
+            }
+
+            // 5. Account Balances
+            reportAccountBalances.innerHTML = '';
+            if (allAccounts.length === 0) {
+                reportAccountBalancesEmpty.classList.remove('hidden');
+            } else {
+                reportAccountBalancesEmpty.classList.add('hidden');
+                allAccounts.sort((a,b) => a.name.localeCompare(b.name)).forEach(acc => {
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+                    item.innerHTML = `
+                        <span class="font-medium">${acc.name}</span>
+                        <span class="font-medium text-gray-800">${formatCurrency(accountBalances[acc.name] || 0)}</span>
+                    `;
+                    reportAccountBalances.appendChild(item);
+                });
+            }
+        }
+
+        downloadCsvBtn.addEventListener('click', () => {
+            const from = new Date(reportFrom.value + 'T00:00:00');
+            const to = new Date(reportTo.value + 'T00:00:00');
+            
+            if (isNaN(from) || isNaN(to)) {
+                alert("Please select a valid date range.");
+                return;
+            }
+
+            const data = getProjectedTransactions(from, to);
+            
+            if (data.length === 0) {
+                alert("No transactions in this period.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Date,Type,Particular,Amount,Account,Recurring,Notes\n";
+
+            data.forEach(t => {
+                const row = [
+                    t.date,
+                    t.type,
+                    `"${t.particular}"`,
+                    t.amount,
+                    `"${t.account}"`,
+                    t.recurring,
+                    `"${t.notes || ''}"`
+                ].join(",");
+                csvContent += row + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `expenses_${getIsoDate(from)}_to_${getIsoDate(to)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // ********** SETTINGS TAB **********
+
+        // Accounts
+        addAccountForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = newAccountName.value.trim();
+            const balance = parseFloat(newAccountBalance.value) || 0;
+            if (name && currentUserId) {
+                try {
+                    await addDoc(collection(db, 'users', currentUserId, 'accounts'), {
+                        name: name,
+                        startingBalance: balance
+                    });
+                    newAccountName.value = '';
+                    newAccountBalance.value = '';
+                } catch (error) {
+                    console.error("Error adding account: ", error);
+                }
+            }
+        });
+
+        function renderAccountsList() {
+            accountList.innerHTML = '';
+            if (allAccounts.length === 0) {
+                accountListEmpty.classList.remove('hidden');
+            } else {
+                accountListEmpty.classList.add('hidden');
+                allAccounts.sort((a,b) => a.name.localeCompare(b.name)).forEach(acc => {
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+                    item.innerHTML = `
+                        <div>
+                            <span class="font-medium">${acc.name}</span>
+                            <span class="text-sm text-gray-500 ml-2">(Start: ${formatCurrency(acc.startingBalance)})</span>
+                        </div>
+                        <div>
+                            <button class="edit-account-btn p-1 text-blue-600 hover:text-blue-800" data-id="${acc.id}">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            </button>
+                            <button class="delete-account-btn p-1 text-red-600 hover:text-red-800" data-id="${acc.id}">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
+                    `;
+                    item.querySelector('.delete-account-btn').addEventListener('click', () => deleteSettingItem('accounts', acc.id));
+                    item.querySelector('.edit-account-btn').addEventListener('click', () => openEditAccountModal(acc.id));
+                    accountList.appendChild(item);
+                });
+            }
+        }
+
+        // Edit Account Modal Logic
+        function openEditAccountModal(id) {
+            const acc = allAccounts.find(a => a.id === id);
+            if (acc) {
+                editAccountId.value = acc.id;
+                editAccountName.value = acc.name;
+                editAccountBalance.value = acc.startingBalance;
+                showModal(editAccountModal);
+            }
+        }
+
+        closeEditAccountModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(editAccountModal);
+        });
+
+        editAccountForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = editAccountId.value;
+            const newBalance = parseFloat(editAccountBalance.value);
+            
+            if (id && !isNaN(newBalance)) {
+                showLoading();
+                try {
+                    const docRef = doc(db, 'users', currentUserId, 'accounts', id);
+                    await updateDoc(docRef, { startingBalance: newBalance });
+                    hideModal(editAccountModal);
+                } catch (error) {
+                    console.error("Error updating account balance:", error);
+                }
+                hideLoading();
+            }
+        });
+
+
+        // Particulars
+        addParticularForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = newParticularName.value.trim();
+            if (name && currentUserId) {
+                try {
+                    await addDoc(collection(db, 'users', currentUserId, 'particulars'), {
+                        name: name
+                    });
+                    newParticularName.value = '';
+                } catch (error) {
+                    console.error("Error adding particular: ", error);
+                }
+            }
+        });
+
+        function renderParticularsList() {
+            particularList.innerHTML = '';
+            if (allParticulars.length === 0) {
+                particularListEmpty.classList.remove('hidden');
+            } else {
+                particularListEmpty.classList.add('hidden');
+                allParticulars.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+                    item.innerHTML = `
+                        <span class="font-medium">${p.name}</span>
+                        <button class="delete-particular-btn p-1 text-red-600 hover:text-red-800" data-id="${p.id}">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    `;
+                    item.querySelector('.delete-particular-btn').addEventListener('click', () => deleteSettingItem('particulars', p.id));
+                    particularList.appendChild(item);
+                });
+            }
+        }
+        
+        async function deleteSettingItem(collectionName, id) {
+            try {
+                await deleteDoc(doc(db, 'users', currentUserId, collectionName, id));
+            } catch (error) {
+                console.error(`Error deleting item from ${collectionName}: `, error);
+            }
+        }
+
+        // Hard Reset
+        hardResetBtn.addEventListener('click', () => showModal(confirmResetModal));
+        cancelResetBtn.addEventListener('click', () => hideModal(confirmResetModal));
+        confirmResetBtn.addEventListener('click', async () => {
+            showLoading();
+            hideModal(confirmResetModal);
+            
+            try {
+                const collections = ['transactions', 'accounts', 'particulars'];
+                const batch = writeBatch(db);
+
+                for (const collName of collections) {
+                    const q = query(collection(db, 'users', currentUserId, collName));
+                    const snapshot = await getDocs(q);
+                    snapshot.docs.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                }
+                
+                await batch.commit();
+                
+            } catch (error) {
+                console.error("Hard reset failed: ", error);
+            }
+            hideLoading();
+        });
+
+
+        // ********** TAB NAVIGATION **********
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Deactivate all
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.add('hidden'));
+                
+                // Activate clicked
+                button.classList.add('active');
+                document.getElementById('tab-' + button.dataset.tab).classList.remove('hidden');
+            });
+        });
+
+        // ********** EVENT LISTENERS **********
+
+        // Log filters
+        logSearch.addEventListener('input', renderLogsTable);
+        logSort.addEventListener('change', renderLogsTable);
+
+        // Upcoming filter
         filterUpcomingBtn.addEventListener('click', renderUpcomingPayments);
+
+        // NEW: Add listeners for quick filters
+        quickFilterButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                setUpcomingDates(button.dataset.period);
+            });
+        });
 
         // NEW: Function to handle quick filter clicks
         function setUpcomingDates(period) {
@@ -1155,490 +1693,14 @@
                     break;
             }
 
-            upcomingFrom.value = getIsoDate(today);
-            upcomingTo.value = getIsoDate(endDate);
+            upcomingFrom.value = getIsoDate(new Date(today.getTime() + (today.getTimezoneOffset() * 60000))); // Adjust for local timezone
+            upcomingTo.value = getIsoDate(new Date(endDate.getTime() + (endDate.getTimezoneOffset() * 60000))); // Adjust for local timezone
             
             // Automatically update the list
             renderUpcomingPayments();
         }
-        
-        logSearch.addEventListener('input', renderLogsTable);
-        logSort.addEventListener('change', renderLogsTable);
-
-        // --- Transaction Modal Logic ---
-        function openTransactionModal(dateString, transactionToEdit = null) {
-            transactionForm.reset();
-            transactionDate.value = dateString;
-            
-            if (transactionToEdit) {
-                modalTitle.textContent = "Edit Transaction";
-                saveTransactionBtn.textContent = "Update Transaction";
-                transactionId.value = transactionToEdit.id;
-                transactionDate.value = transactionToEdit.date;
-                amountInput.value = transactionToEdit.amount;
-                accountInput.value = transactionToEdit.accountId;
-                particularInput.value = transactionToEdit.particularId;
-                frequencyInput.value = transactionToEdit.frequency;
-                notesInput.value = transactionToEdit.notes;
-                if (transactionToEdit.type === 'income') {
-                    typeIncomeRadio.checked = true;
-                } else {
-                    typeExpenseRadio.checked = true;
-                }
-            } else {
-                modalTitle.textContent = `Add Transaction (${dateString})`;
-                saveTransactionBtn.textContent = "Save Transaction";
-                transactionId.value = '';
-                typeExpenseRadio.checked = true;
-            }
-            
-            transactionModal.classList.remove('hidden');
-        }
-
-        function closeModal() {
-            transactionModal.classList.add('hidden');
-        }
-
-        closeModalBtn.addEventListener('click', closeModal);
-        transactionModal.addEventListener('click', (e) => {
-            if (e.target === transactionModal) {
-                closeModal();
-            }
-        });
-
-        transactionForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showLoading();
-
-            const data = {
-                date: transactionDate.value,
-                type: transactionForm.type.value,
-                amount: parseFloat(amountInput.value),
-                accountId: accountInput.value,
-                particularId: particularInput.value,
-                frequency: frequencyInput.value,
-                notes: notesInput.value,
-            };
-            
-            try {
-                if (transactionId.value) {
-                    // Update
-                    const docRef = doc(db, "users", currentUserId, "transactions", transactionId.value);
-                    await updateDoc(docRef, data);
-                } else {
-                    // Create
-                    const collectionRef = collection(db, "users", currentUserId, "transactions");
-                    await addDoc(collectionRef, data);
-                }
-                closeModal();
-            } catch (error) {
-                console.error("Error saving transaction: ", error);
-                alert("Error saving transaction. Please try again.");
-            } finally {
-                hideLoading();
-            }
-        });
-
-        // Use a global click handler for buttons on dynamic content
-        window.handleEditTransaction = (id) => {
-            const transaction = allTransactions.find(t => t.id === id);
-            if (transaction) {
-                openTransactionModal(transaction.date, transaction);
-            }
-        };
-
-        window.handleDeleteTransaction = async (id) => {
-            try {
-                showLoading();
-                const docRef = doc(db, "users", currentUserId, "transactions", id);
-                await deleteDoc(docRef);
-            } catch (error) {
-                console.error("Error deleting transaction: ", error);
-                alert("Error deleting transaction. Please try again.");
-            } finally {
-                hideLoading();
-            }
-        };
-
-        // --- Reports Tab ---
-        function renderReports() {
-            const today = new Date();
-            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            
-            // Get projections for this month, including future ones for calendar accuracy
-            const monthTransactions = getProjectedTransactions(monthStart, monthEnd, true); 
-            
-            // Total Expenses this month
-            const totalExpenses = monthTransactions
-                .filter(t => t.type === 'expense')
-                .reduce((sum, t) => sum + t.amount, 0);
-            reportTotalExpenses.textContent = formatCurrency(totalExpenses);
-
-            // Account Balances & Total Net Balance (based on *past* transactions)
-            renderAccountBalances();
-            
-            // Top Expenses
-            const expenseMap = {};
-            monthTransactions
-                .filter(t => t.type === 'expense')
-                .forEach(t => {
-                    expenseMap[t.particularId] = (expenseMap[t.particularId] || 0) + t.amount;
-                });
-            
-            const topExpenses = Object.entries(expenseMap)
-                .sort(([, a], [, b]) => b - a)
-                .slice(0, 3);
-            
-            reportTopExpenses.innerHTML = '';
-            if (topExpenses.length === 0) {
-                reportTopExpenses.innerHTML = '<p class="text-sm text-zinc-500">No expenses yet.</p>';
-            } else {
-                topExpenses.forEach(([id, amount], index) => {
-                    const particular = allParticulars.find(p => p.id === id)?.name || 'Unknown';
-                    const p = document.createElement('p');
-                    p.className = 'text-sm flex justify-between';
-                    p.innerHTML = `
-                        <span class="font-medium text-zinc-700">${index + 1}. ${particular}</span>
-                        <span class="font-semibold text-zinc-900">${formatCurrency(amount)}</span>
-                    `;
-                    reportTopExpenses.appendChild(p);
-                });
-            }
-        }
-        
-        function renderAccountBalances() {
-            reportAccountBalances.innerHTML = '';
-            let totalNetBalance = 0;
-            
-            if (allAccounts.length === 0) {
-                reportAccountEmpty.classList.remove('hidden');
-                reportIncomeRemaining.textContent = formatCurrency(0);
-                return;
-            }
-            
-            reportAccountEmpty.classList.add('hidden');
-            
-            // Get all transactions from the past up to *today*
-            const allTimeTransactions = getProjectedTransactions(new Date(2000, 0, 1), new Date(), false);
-            
-            allAccounts.forEach(account => {
-                const startingBalance = Number(account.startingBalance) || 0;
-                
-                const income = allTimeTransactions
-                    .filter(t => t.accountId === account.id && t.type === 'income')
-                    .reduce((sum, t) => sum + t.amount, 0);
-                    
-                const expense = allTimeTransactions
-                    .filter(t => t.accountId === account.id && t.type === 'expense')
-                    .reduce((sum, t) => sum + t.amount, 0);
-                    
-                const currentBalance = startingBalance + income - expense;
-                totalNetBalance += currentBalance;
-                
-                const card = document.createElement('div');
-                card.className = 'p-4 bg-zinc-100 rounded-xl';
-                card.innerHTML = `
-                    <div class="text-sm font-medium text-zinc-600">${account.name}</div>
-                    <div class="text-2xl font-bold text-zinc-900">${formatCurrency(currentBalance)}</div>
-                `;
-                reportAccountBalances.appendChild(card);
-            });
-            
-            // Total net balance is the sum of all *current* account balances
-            reportIncomeRemaining.textContent = formatCurrency(totalNetBalance);
-        }
-
-        runComparisonBtn.addEventListener('click', () => {
-            const particularId = compareParticular.value;
-            const period = comparePeriod.value;
-            
-            const today = new Date();
-            let currentPeriodStart, currentPeriodEnd;
-            let prevPeriodStart, prevPeriodEnd;
-
-            // Define current period (always this month to date)
-            currentPeriodStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            currentPeriodEnd = today;
-
-            // Define previous periods
-            if (period === 'last-month') {
-                prevPeriodStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                prevPeriodEnd = new Date(today.getFullYear(), today.getMonth(), 0);
-            } else if (period === 'last-week') {
-                const todayDay = today.getDay(); // 0 = Sun, 1 = Mon...
-                prevPeriodStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - todayDay - 7);
-                prevPeriodEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() - todayDay - 1);
-            } else if (period === 'last-year') {
-                prevPeriodStart = new Date(today.getFullYear() - 1, today.getMonth(), 1);
-                prevPeriodEnd = new Date(today.getFullYear() - 1, today.getMonth() + 1, 0);
-            }
-
-            // Get transactions up to the end date of each period (not future)
-            const currentTransactions = getProjectedTransactions(currentPeriodStart, currentPeriodEnd, false);
-            const prevTransactions = getProjectedTransactions(prevPeriodStart, prevPeriodEnd, false);
-
-            const filterFn = t => t.type === 'expense' && (particularId === 'all' || t.particularId === particularId);
-
-            const currentTotal = currentTransactions.filter(filterFn).reduce((sum, t) => sum + t.amount, 0);
-            const prevTotal = prevTransactions.filter(filterFn).reduce((sum, t) => sum + t.amount, 0);
-
-            const diff = currentTotal - prevTotal;
-            const percentChange = prevTotal === 0 ? (currentTotal > 0 ? 100 : 0) : (diff / prevTotal) * 100;
-
-            let diffText = '';
-            if (diff > 0) {
-                diffText = `<span class="font-bold text-red-600">up ${formatCurrency(diff)} (${percentChange.toFixed(0)}%)</span>`;
-            } else if (diff < 0) {
-                diffText = `<span class="font-bold text-green-600">down ${formatCurrency(Math.abs(diff))} (${percentChange.toFixed(0)}%)</span>`;
-            } else {
-                diffText = `<span class="font-bold text-zinc-700">unchanged (0%)</span>`;
-            }
-
-            comparisonText.innerHTML = `
-                Current period: ${formatCurrency(currentTotal)}<br>
-                Previous period: ${formatCurrency(prevTotal)}<br>
-                Comparison: ${diffText}
-            `;
-            comparisonResult.classList.remove('hidden');
-        });
-        
-        downloadCsvBtn.addEventListener('click', () => {
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Date,Type,Amount,Particular,Account,Frequency,Notes\n";
-
-            allTransactions.forEach(t => {
-                const particular = allParticulars.find(p => p.id === t.particularId)?.name || 'N/A';
-                const account = allAccounts.find(a => a.id === t.accountId)?.name || 'N/A';
-                const row = [
-                    t.date,
-                    t.type,
-                    t.amount,
-                    `"${particular.replace(/"/g, '""')}"`,
-                    `"${account.replace(/"/g, '""')}"`,
-                    t.frequency,
-                    `"${(t.notes || '').replace(/"/g, '""')}"`
-                ].join(",");
-                csvContent += row + "\r\n";
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "expense_report.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-
-        // --- Settings Tab ---
-        function populateDropdowns() {
-            particularInput.innerHTML = '<option value="">Select particular...</option>';
-            accountInput.innerHTML = '<option value="">Select account...</option>';
-            compareParticular.innerHTML = '<option value="all">All Expenses</option>';
-            
-            allParticulars.forEach(p => {
-                particularInput.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-                compareParticular.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-            });
-            allAccounts.forEach(a => {
-                accountInput.innerHTML += `<option value="${a.id}">${a.name}</option>`;
-            });
-        }
-        
-        // Particulars
-        addParticularForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = newParticularName.value.trim();
-            if (!name) return;
-            
-            showLoading();
-            try {
-                const collectionRef = collection(db, "users", currentUserId, "particulars");
-                await addDoc(collectionRef, { name: name });
-                newParticularName.value = '';
-            } catch (error) {
-                console.error("Error adding particular: ", error);
-            } finally {
-                hideLoading();
-            }
-        });
-        
-        function renderParticularsList() {
-            particularsList.innerHTML = '';
-            if (allParticulars.length === 0) {
-                particularsList.innerHTML = '<p class="text-sm text-zinc-500 text-center py-2">No particulars added yet.</p>';
-            }
-            allParticulars.forEach(p => {
-                const item = document.createElement('div');
-                item.className = 'flex justify-between items-center p-3 bg-zinc-50 rounded-lg';
-                item.innerHTML = `
-                    <span class="text-sm font-medium text-zinc-800">${p.name}</span>
-                    <button onclick="handleDeleteParticular('${p.id}')" class="p-1 text-red-500 hover:text-red-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12.54 0c.04.03.079.062.118.095m-9.58 0a48.11 48.11 0 0 1 3.478-.397m11.54 0v-1.12c0-.517-.42-1.03-1.033-1.03H8.704c-.613 0-1.033.513-1.033 1.03v1.12m11.54 0H4.772" /></svg>
-                    </button>
-                `;
-                particularsList.appendChild(item);
-            });
-        }
-        
-        window.handleDeleteParticular = async (id) => {
-            // Note: Add confirmation and check for usage in transactions later
-            showLoading();
-            try {
-                await deleteDoc(doc(db, "users", currentUserId, "particulars", id));
-            } catch (error) {
-                console.error("Error deleting particular: ", error);
-            } finally {
-                hideLoading();
-            }
-        };
-
-        // Accounts
-        addAccountForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = newAccountName.value.trim();
-            const startingBalance = parseFloat(newAccountBalance.value) || 0;
-            if (!name) return;
-            
-            showLoading();
-            try {
-                const collectionRef = collection(db, "users", currentUserId, "accounts");
-                await addDoc(collectionRef, { name: name, startingBalance: startingBalance });
-                newAccountName.value = '';
-                newAccountBalance.value = '';
-            } catch (error) {
-                console.error("Error adding account: ", error);
-            } finally {
-                hideLoading();
-            }
-        });
-        
-        function renderAccountsList() {
-            accountsList.innerHTML = '';
-            if (allAccounts.length === 0) {
-                accountsList.innerHTML = '<p class="text-sm text-zinc-500 text-center py-2">No accounts added yet.</p>';
-            }
-            allAccounts.forEach(a => {
-                const item = document.createElement('div');
-                item.className = 'flex justify-between items-center p-3 bg-zinc-50 rounded-lg';
-                item.innerHTML = `
-                    <div>
-                        <span class="text-sm font-medium text-zinc-800">${a.name}</span>
-                        <span class="text-xs text-zinc-500 block">Start: ${formatCurrency(a.startingBalance)}</span>
-                    </div>
-                    <div class="flex gap-1">
-                        <button onclick="handleEditAccount('${a.id}')" class="p-1 text-indigo-600 hover:text-indigo-800">
-                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
-                        </button>
-                        <button onclick="handleDeleteAccount('${a.id}')" class="p-1 text-red-500 hover:text-red-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12.54 0c.04.03.079.062.118.095m-9.58 0a48.11 48.11 0 0 1 3.478-.397m11.54 0v-1.12c0-.517-.42-1.03-1.033-1.03H8.704c-.613 0-1.033.513-1.033 1.03v1.12m11.54 0H4.772" /></svg>
-                        </button>
-                    </div>
-                `;
-                accountsList.appendChild(item);
-            });
-        }
-        
-        window.handleEditAccount = (id) => {
-            const account = allAccounts.find(a => a.id === id);
-            if (account) {
-                editAccountId.value = account.id;
-                editAccountName.value = account.name;
-                editAccountBalance.value = account.startingBalance;
-                editAccountModal.classList.remove('hidden');
-            }
-        };
-
-        closeEditAccountModalBtn.addEventListener('click', () => {
-            editAccountModal.classList.add('hidden');
-        });
-
-        editAccountForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showLoading();
-            const id = editAccountId.value;
-            const newBalance = parseFloat(editAccountBalance.value);
-            
-            try {
-                const docRef = doc(db, "users", currentUserId, "accounts", id);
-                await updateDoc(docRef, { startingBalance: newBalance });
-                editAccountModal.classList.add('hidden');
-            } catch (error) {
-                console.error("Error updating account: ", error);
-            } finally {
-                hideLoading();
-            }
-        });
-
-        window.handleDeleteAccount = async (id) => {
-            // Note: Add confirmation and check for usage in transactions later
-            showLoading();
-            try {
-                await deleteDoc(doc(db, "users", currentUserId, "accounts", id));
-            } catch (error) {
-                console.error("Error deleting account: ", error);
-            } finally {
-                hideLoading();
-            }
-        };
-
-        // Hard Reset
-        hardResetBtn.addEventListener('click', () => {
-            confirmResetModal.classList.remove('hidden');
-        });
-
-        cancelResetBtn.addEventListener('click', () => {
-            confirmResetModal.classList.add('hidden');
-        });
-
-        confirmResetBtn.addEventListener('click', async () => {
-            showLoading();
-            confirmResetModal.classList.add('hidden');
-            
-            try {
-                const batch = writeBatch(db);
-
-                // Delete all transactions
-                const transQuery = collection(db, "users", currentUserId, "transactions");
-                const transSnapshot = await getDocs(transQuery);
-                transSnapshot.forEach(doc => batch.delete(doc.ref));
-
-                // Delete all particulars
-                const partQuery = collection(db, "users", currentUserId, "particulars");
-                const partSnapshot = await getDocs(partQuery);
-                partSnapshot.forEach(doc => batch.delete(doc.ref));
-
-                // Delete all accounts
-                const accQuery = collection(db, "users", currentUserId, "accounts");
-                const accSnapshot = await getDocs(accQuery);
-                accSnapshot.forEach(doc => batch.delete(doc.ref));
-
-                await batch.commit();
-                
-                // Manually clear local state to refresh UI immediately
-                allTransactions = [];
-                allParticulars = [];
-                allAccounts = [];
-                updateAllData();
-                renderParticularsList();
-                renderAccountsList();
-                populateDropdowns();
-                
-            } catch (error) {
-                console.error("Error during hard reset: ", error);
-                alert("An error occurred during the reset. Please try again.");
-            } finally {
-                hideLoading();
-            }
-        });
-
-
-        // --- Initial Load ---
-        showLoading(); // Show spinner on initial page load
-        // Auth state change will trigger app initialization
 
     </script>
 
 </body>
-</html>s
+</html>
